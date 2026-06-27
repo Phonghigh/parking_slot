@@ -1,6 +1,9 @@
 */node_modules/
-dist/
+*/dist/
 *.log
+
+# TypeScript build cache (generated, never commit)
+*.tsbuildinfo
 
 # SQLite database (sinh ra khi seed)
 server/parking.db

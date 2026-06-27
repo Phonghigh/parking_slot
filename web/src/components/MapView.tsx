@@ -1,19 +1,23 @@
 import { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
+import MarkerClusterGroup from 'react-leaflet-cluster';
+import 'react-leaflet-cluster/lib/assets/MarkerCluster.css';
+import 'react-leaflet-cluster/lib/assets/MarkerCluster.Default.css';
 import L from 'leaflet';
 import { Lot } from '../api';
 import { capacityColor, priceLabel } from '../lib/format';
 
 function lotIcon(lot: Lot, active: boolean) {
   const cap = capacityColor(lot.available_spots, lot.total_spots);
+  const border = active ? `2px solid #00B14F` : `2px solid #fff`;
   return L.divIcon({
     className: '',
     html: `
       <div style="transform: translate(-50%, -100%); display:flex; flex-direction:column; align-items:center;">
-        <div style="background:${cap.color}; color:#fff; font-weight:700; font-size:11px;
-             padding:3px 8px; border-radius:999px; white-space:nowrap; box-shadow:0 2px 6px rgba(0,0,0,.25);
-             border:${active ? '2px solid #0f172a' : '2px solid #fff'};">
-          ${priceLabel(lot)}
+        <div style="background:${cap.color}; color:#fff; font-weight:700; font-size:12px;
+             padding:4px 10px; border-radius:999px; white-space:nowrap;
+             box-shadow:0 3px 10px rgba(0,0,0,.3); border:${border};">
+          ${priceLabel(lot)} · ${lot.available_spots} chỗ
         </div>
         <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
              border-top:7px solid ${cap.color};margin-top:-1px;"></div>
@@ -49,6 +53,11 @@ function DragWatcher({ onMoveEnd }: { onMoveEnd?: (c: [number, number]) => void 
   return null;
 }
 
+function MapClickWatcher({ onClick }: { onClick: () => void }) {
+  useMapEvents({ click: () => onClick() });
+  return null;
+}
+
 export function MapView({
   center,
   userPos,
@@ -56,6 +65,7 @@ export function MapView({
   activeId,
   onSelect,
   onMoveEnd,
+  onMapClick,
 }: {
   center: [number, number];
   userPos: [number, number] | null;
@@ -63,6 +73,7 @@ export function MapView({
   activeId?: number;
   onSelect: (lot: Lot) => void;
   onMoveEnd?: (c: [number, number]) => void;
+  onMapClick?: () => void;
 }) {
   return (
     <MapContainer center={center} zoom={14} zoomControl={false} className="h-full w-full">
@@ -72,15 +83,18 @@ export function MapView({
       />
       <Recenter center={center} />
       <DragWatcher onMoveEnd={onMoveEnd} />
+      {onMapClick && <MapClickWatcher onClick={onMapClick} />}
       {userPos && <Marker position={userPos} icon={userIcon()} />}
-      {lots.map((lot) => (
-        <Marker
-          key={lot.id}
-          position={[lot.lat, lot.lng]}
-          icon={lotIcon(lot, lot.id === activeId)}
-          eventHandlers={{ click: () => onSelect(lot) }}
-        />
-      ))}
+      <MarkerClusterGroup chunkedLoading>
+        {lots.map((lot) => (
+          <Marker
+            key={lot.id}
+            position={[lot.lat, lot.lng]}
+            icon={lotIcon(lot, lot.id === activeId)}
+            eventHandlers={{ click: () => onSelect(lot) }}
+          />
+        ))}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }

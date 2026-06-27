@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api, Lot } from '../api';
 import { MapView } from '../components/MapView';
 import { LotCard } from '../components/LotCard';
-import { effectivePrice, formatDistance } from '../lib/format';
+import { capacityColor, effectivePrice, formatDistance, priceLabel } from '../lib/format';
 import { IconPin, IconStar, IconRoof } from '../components/icons';
 
 const HCMC: [number, number] = [10.7769, 106.7009];
@@ -15,7 +15,7 @@ export function MapPage() {
   const [center, setCenter] = useState<[number, number]>(HCMC);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [lots, setLots] = useState<Lot[]>([]);
-  const [activeId, setActiveId] = useState<number | undefined>();
+  const [activeLot, setActiveLot] = useState<Lot | undefined>();
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [sort, setSort] = useState<SortKey>('distance');
@@ -98,13 +98,15 @@ export function MapPage() {
           center={center}
           userPos={userPos}
           lots={visible}
-          activeId={activeId}
+          activeId={activeLot?.id}
           onSelect={(l) => {
-            setActiveId(l.id);
+            setActiveLot(l);
             setCenter([l.lat, l.lng]);
           }}
           onMoveEnd={(c) => loadLots(c)}
+          onMapClick={() => setActiveLot(undefined)}
         />
+
         {/* Search overlay */}
         <div className="absolute inset-x-0 top-0 z-10 p-3">
           <form onSubmit={search} className="flex gap-2">
@@ -118,11 +120,27 @@ export function MapPage() {
               />
               {searching && <span className="text-xs text-slate-400">…</span>}
             </div>
-            <button type="button" onClick={useGps} className="grid w-12 place-items-center rounded-xl bg-white shadow-md" title="Vị trí của tôi">
+            <button
+              type="button"
+              onClick={useGps}
+              className="grid w-12 place-items-center rounded-xl bg-white shadow-md"
+              title="Vị trí của tôi"
+            >
               <GpsIcon />
             </button>
           </form>
         </div>
+
+        {/* Mini preview card */}
+        {activeLot && (
+          <div className="absolute bottom-4 left-4 right-4 z-[1000]">
+            <MiniLotCard
+              lot={activeLot}
+              onClose={() => setActiveLot(undefined)}
+              onDetail={() => nav(`/lot/${activeLot.id}`)}
+            />
+          </div>
+        )}
       </div>
 
       {/* Bottom sheet (nửa dưới) */}
@@ -133,7 +151,7 @@ export function MapPage() {
             <h2 className="font-bold text-slate-800">{visible.length} bãi đỗ gần đây</h2>
           </div>
 
-          {/* Sort */}
+          {/* Sort & Filter */}
           <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
             <Pill active={sort === 'distance'} onClick={() => setSort('distance')}>Gần nhất</Pill>
             <Pill active={sort === 'price'} onClick={() => setSort('price')}>Rẻ nhất</Pill>
@@ -162,7 +180,66 @@ export function MapPage() {
   );
 }
 
-function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function MiniLotCard({
+  lot,
+  onClose,
+  onDetail,
+}: {
+  lot: Lot;
+  onClose: () => void;
+  onDetail: () => void;
+}) {
+  const cap = capacityColor(lot.available_spots, lot.total_spots);
+  return (
+    <div className="flex items-center gap-3 rounded-2xl bg-white p-3 shadow-xl">
+      <img
+        src={lot.image_url}
+        alt={lot.name}
+        className="h-14 w-14 shrink-0 rounded-xl object-cover"
+      />
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-1">
+          <h3 className="truncate text-sm font-semibold text-slate-800">{lot.name}</h3>
+          <button
+            onClick={onClose}
+            className="shrink-0 text-lg leading-none text-slate-400 hover:text-slate-600"
+          >
+            ×
+          </button>
+        </div>
+        <div className="mt-1 flex items-center gap-2 text-xs text-slate-500">
+          <span className="font-bold text-brand-700">{priceLabel(lot)}</span>
+          <span className="flex items-center gap-1" style={{ color: cap.color }}>
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: cap.color }} />
+            {lot.available_spots} chỗ
+          </span>
+          <span className="flex items-center gap-1 font-medium text-amber-500">
+            <IconStar width={11} /> {lot.rating.toFixed(1)}
+          </span>
+          {lot.distance != null && (
+            <span className="text-slate-400">{formatDistance(lot.distance)}</span>
+          )}
+        </div>
+      </div>
+      <button
+        onClick={onDetail}
+        className="shrink-0 rounded-xl bg-brand-600 px-3 py-2 text-xs font-bold text-white"
+      >
+        Xem →
+      </button>
+    </div>
+  );
+}
+
+function Pill({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
