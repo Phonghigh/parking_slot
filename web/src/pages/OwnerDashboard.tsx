@@ -45,7 +45,7 @@ export function OwnerDashboard() {
       <div className="grid gap-5 lg:grid-cols-3">
         {/* Hero capacity */}
         <div className="card relative overflow-hidden p-6 lg:col-span-2">
-          <span className="pointer-events-none absolute -right-4 -top-8 select-none text-[160px] font-black leading-none text-brand-500/10">P</span>
+          <span className="pointer-events-none absolute -right-4 -top-8 select-none text-[160px] font-black leading-none text-brand-500/10">G</span>
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
             <CapacityGauge pct={stats.occupancyPct} color={cap.color} />
             <div className="min-w-0 flex-1">

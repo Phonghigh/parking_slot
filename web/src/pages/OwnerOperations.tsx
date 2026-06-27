@@ -65,7 +65,7 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
 
 /* ---------------- Check-in ---------------- */
 function parseUserId(text: string): number | null {
-  // Cắt bỏ phần '#nonce' (nếu có) rồi lấy số định danh ở cuối: "PARKSMART-CHECKIN:1" -> 1
+  // Cắt bỏ phần '#nonce' (nếu có) rồi lấy số định danh ở cuối: "GOPARK-CHECKIN:1" -> 1
   const base = text.split('#')[0].trim();
   const m = base.match(/(\d+)\s*$/);
   return m ? Number(m[1]) : null;
@@ -164,7 +164,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
           </div>
         ) : (
           <QrScanner
-            hint="Khách mở app ParkSmart → tab Tài khoản → “Mã QR Check-in” để bạn quét. Không quét được? Nhập số định danh của khách bên dưới (vd: 1)."
+            hint="Khách mở app GoPark → tab Tài khoản → “Mã QR Check-in” để bạn quét. Không quét được? Nhập số định danh của khách bên dưới (vd: 1)."
             manualLabel="Hoặc nhập số định danh khách"
             manualPlaceholder="vd: 1"
             onResult={(t) => {

@@ -35,9 +35,9 @@ export function LoginPage() {
         {/* Logo & headline */}
         <div className="mb-8 text-center">
           <div className="glass-icon-green mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl text-4xl font-extrabold text-brand-600">
-            P
+            G
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-800">ParkSmart</h1>
+          <h1 className="text-3xl font-extrabold text-slate-800">GoPark</h1>
           <p className="mt-1 text-slate-500">Đỗ xe thông minh, không vé giấy</p>
         </div>
 

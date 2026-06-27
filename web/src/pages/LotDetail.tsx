@@ -61,7 +61,7 @@ export function LotDetail() {
         >
           <IconBack />
         </button>
-        <span className="font-bold text-brand-700">ParkSmart</span>
+        <span className="font-bold text-brand-700">GoPark</span>
         <button className="glass-icon grid h-9 w-9 place-items-center rounded-full transition-all duration-300 active:scale-95">
           <IconShare width={18} />
         </button>

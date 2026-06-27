@@ -6,7 +6,7 @@ import { IconBack } from '../components/icons';
 export function CheckinQrPage() {
   const { user } = useAuth();
   const nav = useNavigate();
-  const value = `PARKSMART-CHECKIN:${user?.id}`;
+  const value = `GOPARK-CHECKIN:${user?.id}`;
 
   return (
     <div className="min-h-full bg-slate-100 px-4 py-4">

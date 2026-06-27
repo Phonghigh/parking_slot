@@ -30,7 +30,7 @@ export function RegisterPage() {
       <div className="w-full max-w-sm animate-fade-in">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-extrabold text-slate-800">Tạo tài khoản</h1>
-          <p className="mt-1 text-sm text-slate-500">Chào mừng đến với ParkSmart</p>
+          <p className="mt-1 text-sm text-slate-500">Chào mừng đến với GoPark</p>
         </div>
 
         <form onSubmit={submit} className="card animate-scale-in space-y-4 p-6">

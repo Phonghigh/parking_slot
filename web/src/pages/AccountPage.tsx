@@ -39,7 +39,7 @@ export function AccountPage() {
             <IconWallet width={20} />
           </span>
           <div>
-            <p className="text-xs text-slate-500">Số dư ParkSmart Wallet</p>
+            <p className="text-xs text-slate-500">Số dư GoPark Wallet</p>
             <p className="font-bold text-slate-800">{formatVnd(user?.wallet_balance ?? 0)}</p>
           </div>
         </div>
@@ -72,7 +72,7 @@ export function AccountPage() {
         </button>
       </div>
 
-      <p className="mt-8 text-center text-xs text-slate-400/70">ParkSmart · MVP</p>
+      <p className="mt-8 text-center text-xs text-slate-400/70">GoPark · MVP</p>
     </div>
   );
 }

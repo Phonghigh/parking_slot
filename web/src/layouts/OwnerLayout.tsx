@@ -33,10 +33,10 @@ export function OwnerLayout() {
       <aside className="owner-aside sticky top-0 z-10 flex h-screen w-[260px] shrink-0 flex-col px-4 py-6 text-white">
         <div className="flex items-center gap-3 px-2">
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-xl font-black backdrop-blur">
-            P
+            G
           </span>
           <div>
-            <h1 className="text-lg font-extrabold leading-tight">ParkSmart</h1>
+            <h1 className="text-lg font-extrabold leading-tight">GoPark</h1>
             <p className="text-xs font-medium text-emerald-200/80">Partner Portal</p>
           </div>
         </div>

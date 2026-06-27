@@ -4,7 +4,7 @@ import { formatVnd, formatDateTime } from '../lib/format';
 import { IconHistory, IconStar } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
-const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wallet', cash: 'Tiền mặt' };
+const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'GoPark Wallet', cash: 'Tiền mặt' };
 
 export function HistoryPage() {
   const [sessions, setSessions] = useState<Session[]>([]);

@@ -21,5 +21,5 @@ app.use('/api/sessions', sessionsRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
-  console.log(`ParkSmart API đang chạy tại http://localhost:${PORT}`);
+  console.log(`GoPark API đang chạy tại http://localhost:${PORT}`);
 });

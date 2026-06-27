@@ -176,7 +176,7 @@ router.post('/:id/checkout', requireRole('owner'), (req, res) => {
   db.prepare('UPDATE lots SET available_spots = available_spots + 1 WHERE id = ?').run(lot.id);
   broadcastLot(lot.id); // real-time: chỗ trống +1
 
-  // Trừ ví nếu thanh toán bằng ParkSmart Wallet
+  // Trừ ví nếu thanh toán bằng GoPark Wallet
   if (method === 'wallet') {
     db.prepare('UPDATE users SET wallet_balance = MAX(0, wallet_balance - ?) WHERE id = ?').run(
       fee,

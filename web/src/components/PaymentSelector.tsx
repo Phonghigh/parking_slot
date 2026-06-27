@@ -4,7 +4,7 @@ type Method = 'momo' | 'wallet' | 'cash';
 
 const OPTIONS: { key: Method; label: string; sub?: string; badge: React.ReactNode }[] = [
   { key: 'momo', label: 'Ví MoMo', badge: <span className="grid h-8 w-8 place-items-center rounded-lg bg-pink-600 text-[10px] font-bold text-white">Mo</span> },
-  { key: 'wallet', label: 'ParkSmart Wallet', badge: <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">₽</span> },
+  { key: 'wallet', label: 'GoPark Wallet', badge: <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">₽</span> },
   { key: 'cash', label: 'Tiền mặt tại trạm', badge: <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-200 text-slate-600">$</span> },
 ];
 

@@ -8,7 +8,7 @@ import { formatVnd, formatClock, formatDuration } from '../lib/format';
 import { IconBell, IconCheck, IconTicket, IconStar } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
-const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wallet', cash: 'tiền mặt' };
+const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'GoPark Wallet', cash: 'tiền mặt' };
 
 export function TicketPage() {
   const { user, refresh } = useAuth();
@@ -84,7 +84,7 @@ export function TicketPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-full bg-brand-600" />
-          <span className="font-bold text-brand-700">ParkSmart</span>
+          <span className="font-bold text-brand-700">GoPark</span>
         </div>
         <IconBell width={20} className="text-slate-400" />
       </div>
@@ -196,7 +196,7 @@ function ActiveTicket({
           Đưa mã này vào máy quét tại cổng ra để xác nhận thanh toán tự động.
         </p>
         <div className="mt-4">
-          <QrDisplay value={`PARKSMART-CHECKOUT:${session.checkout_token}`} refreshSeconds={30} />
+          <QrDisplay value={`GOPARK-CHECKOUT:${session.checkout_token}`} refreshSeconds={30} />
         </div>
         {session.short_code && (
           <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3">
@@ -246,7 +246,7 @@ function SuccessView({
           <IconCheck width={34} />
         </div>
         <h1 className="mt-4 text-xl font-extrabold text-slate-800">Thanh toán thành công!</h1>
-        <p className="mt-1 text-sm text-slate-500">Cảm ơn bạn đã sử dụng dịch vụ của ParkSmart.</p>
+        <p className="mt-1 text-sm text-slate-500">Cảm ơn bạn đã sử dụng dịch vụ của GoPark.</p>
 
         <div className="glass-surface mt-5 space-y-3 rounded-3xl p-4 text-left">
           <Row label="Vị trí đỗ xe" value={session.lot.name} strong />

@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'ParkSmart',
-        short_name: 'ParkSmart',
+        name: 'GoPark',
+        short_name: 'GoPark',
         description: 'Tìm bãi đỗ xe & gửi xe không vé giấy',
         theme_color: '#00B14F',
         background_color: '#ffffff',
