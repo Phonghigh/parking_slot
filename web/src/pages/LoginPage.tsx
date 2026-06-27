@@ -30,46 +30,72 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-full items-center justify-center bg-gradient-to-b from-brand-600 to-brand-700 p-6">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center text-white">
-          <div className="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-2xl bg-white/15 text-3xl font-extrabold backdrop-blur">
+    <div className="flex min-h-full items-center justify-center p-6">
+      <div className="w-full max-w-sm animate-fade-in">
+        {/* Logo & headline */}
+        <div className="mb-8 text-center">
+          <div className="glass-icon-green mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl text-4xl font-extrabold text-brand-600">
             P
           </div>
-          <h1 className="text-3xl font-extrabold">ParkSmart</h1>
-          <p className="mt-1 text-brand-100">Đỗ xe thông minh, không vé giấy</p>
+          <h1 className="text-3xl font-extrabold text-slate-800">ParkSmart</h1>
+          <p className="mt-1 text-slate-500">Đỗ xe thông minh, không vé giấy</p>
         </div>
 
-        <form onSubmit={submit} className="card space-y-4 p-6">
+        {/* Glass form card */}
+        <form onSubmit={submit} className="card animate-scale-in space-y-4 p-6">
           <div>
             <label className="label">Tên đăng nhập</label>
-            <input className="input" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="commuter1" />
+            <input
+              className="input"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="commuter1"
+              autoComplete="username"
+            />
           </div>
           <div>
             <label className="label">Mật khẩu</label>
-            <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" />
+            <input
+              className="input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••"
+              autoComplete="current-password"
+            />
           </div>
-          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-          <button className="btn-primary w-full" disabled={busy}>
+
+          {error && (
+            <p className="glass-red rounded-2xl px-4 py-2.5 text-sm text-red-700">{error}</p>
+          )}
+
+          <button className="btn-primary w-full py-3.5 text-base" disabled={busy}>
             {busy ? 'Đang đăng nhập…' : 'Đăng nhập'}
           </button>
 
-          <div className="text-center text-sm text-slate-400">
+          <div className="text-center text-sm text-slate-500">
             Chưa có tài khoản?{' '}
-            <Link to="/register" className="font-semibold text-brand-600">
+            <Link to="/register" className="font-semibold text-blue-600">
               Đăng ký
             </Link>
           </div>
         </form>
 
-        <div className="mt-4 rounded-xl bg-white/10 p-3 text-center text-xs text-white/90">
-          <p className="mb-2 font-medium">Tài khoản demo (mật khẩu: 123456)</p>
+        {/* Demo accounts */}
+        <div className="glass-surface mt-4 rounded-3xl p-4 text-center text-xs text-slate-600">
+          <p className="mb-2.5 font-semibold text-slate-700">Tài khoản demo (mật khẩu: 123456)</p>
           <div className="flex justify-center gap-2">
-            <button onClick={() => quick('commuter1')} className="rounded-lg bg-white/20 px-3 py-1.5 font-medium">
-              👤 commuter1
+            <button
+              onClick={() => quick('commuter1')}
+              className="glass-white rounded-full px-4 py-1.5 text-xs font-semibold text-slate-700 transition active:scale-95"
+            >
+              Người dùng
             </button>
-            <button onClick={() => quick('owner1')} className="rounded-lg bg-white/20 px-3 py-1.5 font-medium">
-              🅿️ owner1
+            <button
+              onClick={() => quick('owner1')}
+              className="glass-green rounded-full px-4 py-1.5 text-xs font-semibold text-brand-700 transition active:scale-95"
+            >
+              Chủ bãi xe
             </button>
           </div>
         </div>
