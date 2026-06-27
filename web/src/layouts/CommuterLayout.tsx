@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { IconMap, IconTicket, IconHistory } from '../components/icons';
+import { IconMap, IconTicket, IconHistory, IconUser } from '../components/icons';
 
 export function CommuterLayout() {
   return (
@@ -12,6 +12,7 @@ export function CommuterLayout() {
           <Tab to="/" icon={<IconMap />} label="Bản đồ" end />
           <Tab to="/ticket" icon={<IconTicket />} label="Vé của tôi" />
           <Tab to="/history" icon={<IconHistory />} label="Lịch sử" />
+          <Tab to="/account" icon={<IconUser />} label="Tài khoản" />
         </div>
       </nav>
     </div>

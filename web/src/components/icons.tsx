@@ -76,3 +76,6 @@ export const IconCar = (p: P) => (
 export const IconWallet = (p: P) => (
   <svg {...base(p)}><path d="M20 12V8H6a2 2 0 110-4h12v4" /><path d="M4 6v12a2 2 0 002 2h14v-4" /><path d="M18 12a2 2 0 000 4h4v-4z" /></svg>
 );
+export const IconUser = (p: P) => (
+  <svg {...base(p)}><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+);
