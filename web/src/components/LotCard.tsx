@@ -7,18 +7,21 @@ export function LotCard({ lot, onClick }: { lot: Lot; onClick?: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="card flex w-full items-stretch gap-3 p-3 text-left transition hover:shadow-md"
+      className="card flex w-full items-stretch gap-3 p-3 text-left transition-all duration-300 active:scale-[0.975]"
     >
       <img
         src={lot.image_url}
         alt={lot.name}
-        className="h-20 w-20 shrink-0 rounded-xl object-cover"
+        className="h-20 w-20 shrink-0 rounded-2xl object-cover"
         loading="lazy"
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
           <h3 className="truncate font-semibold text-slate-800">{lot.name}</h3>
-          <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 text-sm font-bold text-brand-700">
+          <span
+            className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold text-brand-700"
+            style={{ background: 'rgba(0,177,79,0.12)', border: '1px solid rgba(0,177,79,0.20)' }}
+          >
             {priceLabel(lot)}
           </span>
         </div>

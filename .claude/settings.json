@@ -6,7 +6,12 @@
       "Bash(python3 *)",
       "Bash(npm install *)",
       "Bash(npx tsc *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py \"smart city parking navigation mobility enterprise minimal\" --design-system -p \"ParkHub\" -f markdown)",
+      "Bash(python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py \"smart city parking navigation enterprise minimal\" --design-system -p \"ParkHub\")",
+      "Bash(find ~/.claude/skills/ui-ux-pro-max -name \"*.py\" 2>/dev/null | head -5)",
+      "Read(//home/fionn/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(ls ~/.claude/skills/ui-ux-pro-max/ 2>/dev/null)"
     ]
   },
   "hooks": {

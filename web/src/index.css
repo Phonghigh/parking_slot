@@ -9,49 +9,293 @@
   #root {
     height: 100%;
   }
+
   body {
-    @apply bg-slate-100 text-slate-900 antialiased;
+    @apply text-slate-900 antialiased;
+    background: #F5F5F7;
   }
 }
 
 @layer components {
+  /* ── Buttons ─────────────────────────────────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold transition active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-semibold transition-all duration-150 active:scale-[0.97];
   }
+
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-700;
+    color: white;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #007aff, #5ac8fa);
+    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.28);
+    @apply btn;
   }
+  .btn-primary:hover {
+    box-shadow: 0 12px 32px rgba(0, 122, 255, 0.35);
+  }
+
   .btn-outline {
-    @apply btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+    @apply btn border border-white/40 text-slate-700;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
   }
+
   .btn-ghost {
-    @apply btn text-slate-600 hover:bg-slate-100;
+    @apply btn text-slate-600;
+    background: rgba(255, 255, 255, 0.12);
   }
+
+  /* ── Card ─────────────────────────────────────────────────────── */
   .card {
-    @apply rounded-2xl bg-white shadow-sm;
+    background: rgba(255, 255, 255, 0.58);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 28px;
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 6px 24px rgba(31, 38, 135, 0.10),
+      0 1px 4px rgba(0, 0, 0, 0.05);
   }
-  .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1.5 text-sm font-medium text-brand-700;
+  .card:hover {
+    background: rgba(255, 255, 255, 0.70);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+      0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      0 10px 32px rgba(31, 38, 135, 0.14),
+      0 2px 8px rgba(0, 0, 0, 0.06);
   }
+
+  /* ── Liquid Glass Nav ─────────────────────────────────────────── */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(40px) saturate(220%);
+    -webkit-backdrop-filter: blur(40px) saturate(220%);
+    border: 1px solid rgba(255, 255, 255, 0.90);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.98),
+      0 0 0 0.5px rgba(0, 0, 0, 0.06),
+      0 8px 24px rgba(0, 0, 0, 0.12),
+      0 24px 48px rgba(0, 0, 0, 0.08);
+  }
+
+  /* ── Generic glass surface ────────────────────────────────────── */
+  .glass-surface {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.03),
+      0 0 0 0.5px rgba(0, 0, 0, 0.04),
+      0 4px 16px rgba(31, 38, 135, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ── Glass header / action bar ────────────────────────────────── */
+  .glass-header {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.80);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 1px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  /* ── Glass search bar ─────────────────────────────────────────── */
+  .glass-search {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.80);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 6px 24px rgba(31, 38, 135, 0.14);
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .glass-search:focus-within {
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(0, 122, 255, 0.45);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 0 0 3.5px rgba(0, 122, 255, 0.15),
+      0 6px 24px rgba(31, 38, 135, 0.16);
+  }
+
+  /* ── Glass bottom sheet ───────────────────────────────────────── */
+  .glass-sheet {
+    background: rgba(255, 255, 255, 0.60);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border-top: 1px solid rgba(255, 255, 255, 0.80);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
+      0 -4px 24px rgba(31, 38, 135, 0.07);
+  }
+
+  /* ── Tinted glass — semantic colors ───────────────────────────── */
+  .glass-green {
+    background: rgba(0, 177, 79, 0.10);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid rgba(0, 177, 79, 0.28);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.80),
+      0 2px 8px rgba(0, 177, 79, 0.10);
+  }
+  .glass-blue {
+    background: rgba(0, 122, 255, 0.10);
+    border: 1px solid rgba(0, 122, 255, 0.20);
+  }
+  .glass-red {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.20);
+  }
+  .glass-white {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.82);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      0 1px 4px rgba(0, 0, 0, 0.07);
+  }
+
+  /* ── Liquid Glass active filter pill ─────────────────────────── */
+  .pill-active {
+    background: linear-gradient(170deg, rgba(255,255,255,0.50) 0%, rgba(0,177,79,0.38) 100%);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.70);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
+      inset 0 -1px 0 rgba(0, 177, 79, 0.20),
+      0 4px 16px rgba(0, 177, 79, 0.28),
+      0 1px 3px rgba(0, 0, 0, 0.06);
+    color: #007A35;
+  }
+
+  /* ── Icon container backgrounds ───────────────────────────────── */
+  .glass-icon {
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.80);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  .glass-icon-green {
+    background: rgba(0, 177, 79, 0.14);
+    border: 2px solid rgba(0, 177, 79, 0.30);
+  }
+  .glass-icon-blue {
+    background: linear-gradient(135deg, #007aff, #5ac8fa);
+    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
+  }
+  .glass-icon-red {
+    background: rgba(239, 68, 68, 0.10);
+    border: 1px solid rgba(239, 68, 68, 0.20);
+  }
+
+  /* ── Input ────────────────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+    @apply w-full px-4 py-3 text-slate-800 outline-none transition;
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.40);
+    border-radius: 16px;
   }
+  .input::placeholder {
+    @apply text-slate-400;
+  }
+  .input:focus {
+    border-color: rgba(0, 122, 255, 0.5);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+    background: rgba(255, 255, 255, 0.40);
+  }
+
+  /* ── Label ────────────────────────────────────────────────────── */
   .label {
     @apply mb-1.5 block text-sm font-medium text-slate-600;
   }
+
+  /* ── Chip ─────────────────────────────────────────────────────── */
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium text-brand-700;
+    background: rgba(0, 177, 79, 0.08);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(0, 177, 79, 0.25);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+      0 1px 4px rgba(0, 177, 79, 0.08);
+  }
+
+  /* ── Plate (license plate badge) ─────────────────────────────── */
   .plate {
-    @apply inline-flex items-center justify-center rounded-md border-2 border-slate-800 bg-white px-2 py-1 font-mono font-bold tracking-wide text-slate-900;
+    @apply inline-flex items-center justify-center rounded-md border-2 border-slate-700 px-2 py-1 font-mono font-bold tracking-wide text-slate-900;
+    background: rgba(255, 255, 255, 0.60);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* ── Shimmer skeleton ─────────────────────────────────────────── */
+  .skeleton {
+    background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+    background-size: 200% 100%;
+    @apply animate-shimmer rounded-2xl;
+  }
+
+  /* ── Liquid blob tab indicator ────────────────────────────────── */
+  .blob-indicator {
+    position: absolute;
+    top: 50%;
+    height: 44px;
+    translate: 0 -50%;
+    border-radius: 9999px;
+    /* glass gradient: bright at top, green-tinted at bottom */
+    background: linear-gradient(
+      175deg,
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(0, 177, 79, 0.22) 100%
+    );
+    backdrop-filter: blur(16px) saturate(200%);
+    -webkit-backdrop-filter: blur(16px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.70);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
+      inset 0 -1px 0 rgba(0, 177, 79, 0.15),
+      0 4px 20px rgba(0, 177, 79, 0.22),
+      0 1px 4px rgba(0, 0, 0, 0.06);
+    pointer-events: none;
+    /* phase-1 stretch: fast, no spring — blob bridges source to destination */
+    transition: left 0.15s ease-out, width 0.15s ease-out;
+  }
+  .blob-indicator.landing {
+    /* phase-2 contract: spring snap to destination size */
+    transition:
+      left 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-/* Leaflet map cần chiều cao tường minh */
+/* ── Leaflet map ──────────────────────────────────────────────── */
 .leaflet-container {
   height: 100%;
   width: 100%;
   z-index: 0;
 }
 
-/* Scrollbar gọn cho bottom sheet */
+/* ── Scrollbar ────────────────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
