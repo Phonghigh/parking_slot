@@ -51,6 +51,19 @@
   z-index: 0;
 }
 
+/* html5-qrcode: video lấp đầy khung vuông (object-fit cover) */
+[id^='qr-reader-'] {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+[id^='qr-reader-'] video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
 /* Scrollbar gọn cho bottom sheet */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

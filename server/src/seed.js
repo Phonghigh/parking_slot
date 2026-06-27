@@ -1,5 +1,5 @@
 import { db, initSchema } from './db.js';
-import { computeFee, generateSlotLabel, randomToken } from './lib.js';
+import { computeFee, generateSlotLabel, randomToken, shortCode } from './lib.js';
 
 initSchema();
 
@@ -86,8 +86,8 @@ lotRecords.forEach((lot, i) => {
 // ---- Seed phiên gửi xe cho bãi của owner1 (lot đầu tiên) để dashboard có số ----
 const demoLot = lotRecords[0];
 const insertSession = db.prepare(`
-  INSERT INTO sessions (lot_id, user_id, plate, slot_label, checkin_at, checkout_at, status, checkout_token, fee, payment_method)
-  VALUES (?,?,?,?,?,?,?,?,?,?)
+  INSERT INTO sessions (lot_id, user_id, plate, slot_label, checkin_at, checkout_at, status, checkout_token, short_code, fee, payment_method)
+  VALUES (?,?,?,?,?,?,?,?,?,?,?)
 `);
 
 const HOUR = 60 * 60 * 1000;
@@ -115,7 +115,7 @@ for (let i = 0; i < 26; i++) {
   const fee = computeFee(demoLot, checkinAt, checkoutAt);
   insertSession.run(
     demoLot.id, pick(guestIds), nextPlate(), generateSlotLabel(),
-    checkinAt, checkoutAt, 'completed', randomToken(), fee, pick(methods)
+    checkinAt, checkoutAt, 'completed', randomToken(), null, fee, pick(methods)
   );
 }
 
@@ -125,12 +125,27 @@ for (let i = 0; i < 3; i++) {
   const checkinAt = now - Math.floor((0.3 + Math.random() * 3) * HOUR);
   insertSession.run(
     demoLot.id, guestIds[i], nextPlate(), generateSlotLabel(),
-    checkinAt, null, 'active', randomToken(), null, null
+    checkinAt, null, 'active', randomToken(), shortCode(), null, null
   );
   activeCount++;
 }
 db.prepare('UPDATE lots SET available_spots = MAX(0, total_spots - ?) WHERE id = ?')
   .run(activeCount, demoLot.id);
 
+// commuter1 đang gửi 2 XE KHÁC NHAU ở 2 bãi (demo: 1 người - nhiều xe/nhiều biển)
+const commuter1Id = 1;
+const c1 = [
+  { lot: lotRecords[0], plate: '59X2-456.78', ago: 1.5 },   // Vincom (bãi của owner1)
+  { lot: lotRecords[3], plate: '51K9-222.33', ago: 0.8 },   // Saigon Centre
+];
+c1.forEach(({ lot, plate, ago }) => {
+  insertSession.run(
+    lot.id, commuter1Id, plate, generateSlotLabel(),
+    now - Math.floor(ago * HOUR), null, 'active', randomToken(), shortCode(), null, null
+  );
+  db.prepare('UPDATE lots SET available_spots = MAX(0, available_spots - 1) WHERE id = ?').run(lot.id);
+});
+
 console.log(`Seed xong: ${lots.length} bãi (mỗi bãi 1 owner), ${guestIds.length} guest, 29 phiên cho bãi "${demoLot.name}".`);
+console.log('commuter1 đang gửi 2 xe:', c1.map((x) => x.plate).join(', '));
 console.log('Demo: commuter1/123456 · owner1/123456 (quản lý "' + demoLot.name + '") · owner2..owner12/123456');

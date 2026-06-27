@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth, requireRole } from '../auth.js';
-import { randomToken, computeFee, generateSlotLabel } from '../lib.js';
+import { randomToken, computeFee, generateSlotLabel, shortCode } from '../lib.js';
 
 const router = Router();
 
@@ -46,35 +46,50 @@ router.post('/', requireRole('owner'), (req, res) => {
     .prepare("SELECT * FROM users WHERE id = ? AND role = 'commuter'").get(userId);
   if (!commuter) return res.status(404).json({ error: 'Không tìm thấy người dùng (QR không hợp lệ)' });
 
+  // 1 người có thể gửi NHIỀU xe cùng lúc, nhưng CÙNG 1 xe (biển số) thì không được 2 phiên active
+  const plateNorm = plate.toUpperCase().trim();
   const active = db
-    .prepare("SELECT id FROM sessions WHERE user_id = ? AND status = 'active'")
-    .get(userId);
+    .prepare("SELECT id FROM sessions WHERE user_id = ? AND plate = ? AND status = 'active'")
+    .get(userId, plateNorm);
   if (active)
-    return res.status(409).json({ error: 'Người dùng này đang có phiên gửi xe chưa kết thúc' });
+    return res.status(409).json({ error: `Xe ${plateNorm} đang có phiên gửi chưa kết thúc` });
 
   if (lot.available_spots <= 0)
     return res.status(409).json({ error: 'Bãi đã hết chỗ' });
 
   const checkoutToken = randomToken();
   const slotLabel = generateSlotLabel();
+  // Mã ngắn duy nhất trong các phiên đang active
+  let code = shortCode();
+  while (db.prepare("SELECT 1 FROM sessions WHERE short_code = ? AND status = 'active'").get(code)) {
+    code = shortCode();
+  }
   const info = db
     .prepare(
-      `INSERT INTO sessions (lot_id, user_id, plate, slot_label, checkin_at, status, checkout_token)
-       VALUES (?,?,?,?,?,'active',?)`
+      `INSERT INTO sessions (lot_id, user_id, plate, slot_label, checkin_at, status, checkout_token, short_code)
+       VALUES (?,?,?,?,?,'active',?,?)`
     )
-    .run(lotId, userId, plate.toUpperCase(), slotLabel, Date.now(), checkoutToken);
+    .run(lotId, userId, plateNorm, slotLabel, Date.now(), checkoutToken, code);
   db.prepare('UPDATE lots SET available_spots = available_spots - 1 WHERE id = ?').run(lotId);
 
   const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(Number(info.lastInsertRowid));
   res.json({ session: enrich(session) });
 });
 
-// GET /api/sessions/active  (commuter) → phiên đang gửi của chính mình
+// GET /api/sessions/active  (commuter) → phiên đang gửi mới nhất (giữ tương thích)
 router.get('/active', requireAuth, (req, res) => {
   const session = db
     .prepare("SELECT * FROM sessions WHERE user_id = ? AND status = 'active' ORDER BY id DESC")
     .get(req.user.id);
   res.json({ session: session ? enrich(session) : null });
+});
+
+// GET /api/sessions/active-list  (commuter) → TẤT CẢ phiên đang gửi (nhiều xe)
+router.get('/active-list', requireAuth, (req, res) => {
+  const rows = db
+    .prepare("SELECT * FROM sessions WHERE user_id = ? AND status = 'active' ORDER BY id DESC")
+    .all(req.user.id);
+  res.json({ sessions: rows.map(enrich) });
 });
 
 // GET /api/sessions/history  (commuter)
@@ -85,17 +100,38 @@ router.get('/history', requireAuth, (req, res) => {
   res.json({ sessions: rows.map(enrich) });
 });
 
-// GET /api/sessions/lookup?token=<checkout_token>  (owner) → tra cứu phiên để đối chiếu trước khi checkout
+// GET /api/sessions/lookup?q=<token|short_code>  (owner) → tra cứu phiên để đối chiếu trước khi checkout
 router.get('/lookup', requireRole('owner'), (req, res) => {
-  const token = req.query.token;
-  if (!token) return res.status(400).json({ error: 'Thiếu token' });
-  const session = db
+  const q = (req.query.q || req.query.token || req.query.code || '').toString().trim();
+  if (!q) return res.status(400).json({ error: 'Thiếu mã checkout' });
+  let session = db
     .prepare("SELECT * FROM sessions WHERE checkout_token = ? AND status = 'active'")
-    .get(token);
+    .get(q);
+  if (!session) {
+    session = db
+      .prepare("SELECT * FROM sessions WHERE short_code = ? AND status = 'active'")
+      .get(q.toUpperCase());
+  }
   if (!session) return res.status(404).json({ error: 'Không tìm thấy phiên (mã không hợp lệ hoặc đã checkout)' });
   const lot = getLot(session.lot_id);
   if (lot.owner_id !== req.user.id)
     return res.status(403).json({ error: 'Phiên này thuộc bãi khác' });
+  res.json({ session: enrich(session) });
+});
+
+// GET /api/sessions/find?plate=...  (owner) → DỰ PHÒNG khi khách mất/hết pin điện thoại:
+// tra phiên đang gửi tại bãi của owner theo biển số.
+router.get('/find', requireRole('owner'), (req, res) => {
+  const plate = (req.query.plate || '').toString().toUpperCase().replace(/\s/g, '');
+  if (!plate) return res.status(400).json({ error: 'Thiếu biển số' });
+  const lot = db.prepare('SELECT * FROM lots WHERE owner_id = ? ORDER BY id LIMIT 1').get(req.user.id);
+  if (!lot) return res.status(404).json({ error: 'Owner chưa gắn bãi nào' });
+  const rows = db
+    .prepare("SELECT * FROM sessions WHERE lot_id = ? AND status = 'active'")
+    .all(lot.id);
+  const session = rows.find((s) => s.plate.replace(/\s/g, '') === plate);
+  if (!session)
+    return res.status(404).json({ error: `Không có xe ${plate} đang gửi tại bãi này` });
   res.json({ session: enrich(session) });
 });
 

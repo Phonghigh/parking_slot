@@ -4,6 +4,15 @@ export function randomToken(bytes = 16) {
   return randomBytes(bytes).toString('hex');
 }
 
+// Mã checkout NGẮN, dễ đọc/gõ (6 ký tự, bỏ ký tự dễ nhầm: 0 O 1 I L)
+const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export function shortCode(len = 6) {
+  const bytes = randomBytes(len);
+  let out = '';
+  for (let i = 0; i < len; i++) out += CODE_ALPHABET[bytes[i] % CODE_ALPHABET.length];
+  return out;
+}
+
 // Khoảng cách Haversine (km)
 export function haversineKm(lat1, lng1, lat2, lng2) {
   const R = 6371;

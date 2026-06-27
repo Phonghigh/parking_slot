@@ -73,6 +73,7 @@ export interface Session {
   checkout_at: number | null;
   status: 'active' | 'completed';
   checkout_token: string;
+  short_code: string | null;
   fee: number | null;
   payment_method: 'momo' | 'wallet' | 'cash' | null;
   estimate_fee: number;
@@ -144,6 +145,7 @@ export const api = {
       body: JSON.stringify({ lotId, userId, plate }),
     }),
   activeSession: () => request<{ session: Session | null }>('/sessions/active'),
+  activeSessions: () => request<{ sessions: Session[] }>('/sessions/active-list'),
   getSession: (id: number) => request<{ session: Session }>(`/sessions/${id}`),
   history: () => request<{ sessions: Session[] }>('/sessions/history'),
   setPayment: (id: number, payment_method: string) =>
@@ -151,8 +153,12 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ payment_method }),
     }),
-  lookupByToken: (token: string) =>
-    request<{ session: Session }>(`/sessions/lookup?token=${encodeURIComponent(token)}`),
+  // Tra cứu phiên checkout bằng token (QR) HOẶC mã ngắn người dùng đọc
+  lookupByToken: (q: string) =>
+    request<{ session: Session }>(`/sessions/lookup?q=${encodeURIComponent(q)}`),
+  // Dự phòng: tra phiên đang gửi theo biển số (khách mất/hết pin điện thoại)
+  findByPlate: (plate: string) =>
+    request<{ session: Session }>(`/sessions/find?plate=${encodeURIComponent(plate)}`),
   checkout: (id: number, plate: string) =>
     request<{ session: Session; fee: number; payment_method: string }>(
       `/sessions/${id}/checkout`,

@@ -69,10 +69,21 @@ export function initSchema() {
       checkout_at INTEGER,
       status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active','completed')),
       checkout_token TEXT NOT NULL,
+      short_code TEXT,
       fee INTEGER,
       payment_method TEXT CHECK (payment_method IN ('momo','wallet','cash')),
       FOREIGN KEY (lot_id) REFERENCES lots(id),
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
+
+  // Migration an toàn cho DB cũ (thêm cột nếu thiếu)
+  addColumnIfMissing('sessions', 'short_code', 'TEXT');
+}
+
+function addColumnIfMissing(table, col, def) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.find((c) => c.name === col)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+  }
 }

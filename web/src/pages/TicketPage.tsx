@@ -12,28 +12,27 @@ const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wall
 export function TicketPage() {
   const { user, refresh } = useAuth();
   const nav = useNavigate();
-  const [active, setActive] = useState<Session | null>(null);
+  const [actives, setActives] = useState<Session[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [completed, setCompleted] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const lastId = useRef<number | null>(null);
+  const seenRef = useRef<Set<number>>(new Set());
 
-  // poll phiên active
+  // poll danh sách phiên active (1 người có thể gửi nhiều xe)
   useEffect(() => {
     let stop = false;
     const tick = async () => {
       try {
-        const r = await api.activeSession();
+        const r = await api.activeSessions();
         if (stop) return;
-        if (r.session) {
-          setActive(r.session);
-          lastId.current = r.session.id;
-          setCompleted(null);
-        } else {
-          setActive(null);
-          // vừa checkout xong → lấy chi tiết để hiện màn thành công
-          if (lastId.current && !completed) {
+        const list = r.sessions;
+        const ids = new Set(list.map((s) => s.id));
+
+        // phiên vừa biến mất khỏi active → kiểm tra đã checkout chưa để hiện màn thành công
+        for (const id of seenRef.current) {
+          if (!ids.has(id)) {
             try {
-              const detail = await api.getSession(lastId.current);
+              const detail = await api.getSession(id);
               if (detail.session.status === 'completed') {
                 setCompleted(detail.session);
                 refresh();
@@ -43,6 +42,9 @@ export function TicketPage() {
             }
           }
         }
+        seenRef.current = ids;
+        setActives(list);
+        setSelectedId((cur) => (cur != null && ids.has(cur) ? cur : list[0]?.id ?? null));
       } finally {
         if (!stop) setLoading(false);
       }
@@ -56,13 +58,63 @@ export function TicketPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const patchSession = (s: Session) =>
+    setActives((list) => list.map((x) => (x.id === s.id ? s : x)));
+
   if (loading) return <div className="grid h-full place-items-center text-slate-400">Đang tải…</div>;
 
-  if (completed) return <SuccessView session={completed} onHome={() => nav('/')} onHistory={() => nav('/history')} />;
+  if (completed)
+    return (
+      <SuccessView
+        session={completed}
+        remaining={actives.length}
+        onHome={() => nav('/')}
+        onHistory={() => nav('/history')}
+        onBack={() => setCompleted(null)}
+      />
+    );
 
-  if (!active) return <EmptyTicket onFind={() => nav('/')} />;
+  if (actives.length === 0) return <EmptyTicket onFind={() => nav('/')} />;
 
-  return <ActiveTicket session={active} walletBalance={user?.wallet_balance ?? 0} onPay={setActive} />;
+  const selected = actives.find((s) => s.id === selectedId) ?? actives[0];
+
+  return (
+    <div className="space-y-4 px-4 py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="h-3 w-3 rounded-full bg-brand-600" />
+          <span className="font-bold text-brand-700">ParkSmart</span>
+        </div>
+        <IconBell width={20} className="text-slate-400" />
+      </div>
+      <div>
+        <h1 className="text-xl font-extrabold text-slate-900">Xe đang gửi</h1>
+        <p className="text-sm text-slate-400">
+          {actives.length > 1 ? `Bạn đang gửi ${actives.length} xe` : `Đang đỗ tại ${selected.lot.name}`}
+        </p>
+      </div>
+
+      {/* Bộ chọn xe khi gửi nhiều xe */}
+      {actives.length > 1 && (
+        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+          {actives.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSelectedId(s.id)}
+              className={`flex shrink-0 items-center gap-2 rounded-xl border-2 px-3 py-2 transition ${
+                s.id === selected.id ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white'
+              }`}
+            >
+              <span className="plate text-sm">{s.plate}</span>
+              <span className="max-w-[7rem] truncate text-xs text-slate-400">{s.lot.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <ActiveTicket session={selected} walletBalance={user?.wallet_balance ?? 0} onPay={patchSession} />
+    </div>
+  );
 }
 
 function EmptyTicket({ onFind }: { onFind: () => void }) {
@@ -99,20 +151,7 @@ function ActiveTicket({
   };
 
   return (
-    <div className="space-y-4 px-4 py-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-brand-600" />
-          <span className="font-bold text-brand-700">ParkSmart</span>
-        </div>
-        <IconBell width={20} className="text-slate-400" />
-      </div>
-      <div>
-        <h1 className="text-xl font-extrabold text-slate-900">Phiên đỗ xe hiện tại</h1>
-        <p className="text-sm text-slate-400">Đang đỗ tại {session.lot.name}</p>
-      </div>
-
+    <div className="space-y-4">
       {/* Ticket card */}
       <div className="card overflow-hidden">
         <div className="flex items-start justify-between gap-3 p-4">
@@ -155,6 +194,14 @@ function ActiveTicket({
         <div className="mt-4">
           <QrDisplay value={`PARKSMART-CHECKOUT:${session.checkout_token}`} refreshSeconds={30} />
         </div>
+        {session.short_code && (
+          <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3">
+            <p className="text-xs text-slate-400">Quét khó? Đọc mã này cho nhân viên nhập</p>
+            <p className="mt-1 font-mono text-2xl font-extrabold tracking-[0.3em] text-brand-700">
+              {session.short_code}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -169,7 +216,19 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function SuccessView({ session, onHome, onHistory }: { session: Session; onHome: () => void; onHistory: () => void }) {
+function SuccessView({
+  session,
+  remaining,
+  onHome,
+  onHistory,
+  onBack,
+}: {
+  session: Session;
+  remaining: number;
+  onHome: () => void;
+  onHistory: () => void;
+  onBack: () => void;
+}) {
   const inT = session.checkin_at;
   const outT = session.checkout_at ?? Date.now();
   const mins = Math.round((outT - inT) / 60000);
@@ -199,7 +258,13 @@ function SuccessView({ session, onHome, onHistory }: { session: Session; onHome:
           </div>
         </div>
 
-        <button onClick={onHome} className="btn-primary mt-5 w-full">Về trang chủ</button>
+        {remaining > 0 ? (
+          <button onClick={onBack} className="btn-primary mt-5 w-full">
+            Xem {remaining} xe đang gửi
+          </button>
+        ) : (
+          <button onClick={onHome} className="btn-primary mt-5 w-full">Về trang chủ</button>
+        )}
         <button onClick={onHistory} className="btn-outline mt-2 w-full">Xem lịch sử</button>
       </div>
     </div>

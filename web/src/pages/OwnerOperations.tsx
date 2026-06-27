@@ -242,6 +242,21 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
     }
   };
 
+  // DỰ PHÒNG: khách mất / hết pin điện thoại -> tra theo biển số
+  const [lookupPlate, setLookupPlate] = useState('');
+  const [fallback, setFallback] = useState(false);
+  const findByPlate = async () => {
+    if (!lookupPlate.trim()) return;
+    setError('');
+    try {
+      const r = await api.findByPlate(lookupPlate.trim());
+      setSession(r.session);
+      setPlate(r.session.plate);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  };
+
   const confirm = async () => {
     if (!session) return;
     setBusy(true);
@@ -283,12 +298,42 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
             <IconQr width={18} className="mb-1" /> Đã tìm thấy phiên #{session.id}
           </div>
         ) : (
-          <QrScanner
-            hint="Khách mở tab “Vé của tôi” → “Mã QR Checkout” để bạn quét. Không quét được? Nhập mã checkout bên dưới."
-            manualLabel="Hoặc nhập mã checkout"
-            manualPlaceholder="Mã checkout"
-            onResult={onScan}
-          />
+          <>
+            <QrScanner
+              hint="Khách mở tab “Vé của tôi” → “Mã QR Checkout” để bạn quét. Không quét được? Nhập mã ngắn (6 ký tự) khách đọc cho bạn vào ô bên dưới."
+              manualLabel="Hoặc nhập mã checkout (6 ký tự)"
+              manualPlaceholder="VD: ABC123"
+              onResult={onScan}
+            />
+
+            {/* Dự phòng: mất / hết pin điện thoại */}
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3">
+              <button
+                onClick={() => setFallback((v) => !v)}
+                className="flex w-full items-center justify-between text-sm font-semibold text-amber-700"
+              >
+                <span>🔋 Khách mất / hết pin điện thoại?</span>
+                <span>{fallback ? '▲' : '▼'}</span>
+              </button>
+              {fallback && (
+                <div className="mt-2">
+                  <p className="mb-2 text-xs text-amber-700/80">
+                    Tra phiên đang gửi theo <b>biển số xe</b> (xác minh thêm bằng CCCD / cà vẹt xe).
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      className="input bg-white font-mono uppercase"
+                      placeholder="Biển số xe"
+                      value={lookupPlate}
+                      onChange={(e) => setLookupPlate(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => e.key === 'Enter' && findByPlate()}
+                    />
+                    <button onClick={findByPlate} className="btn-primary shrink-0">Tìm xe</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 
