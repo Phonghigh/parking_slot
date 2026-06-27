@@ -20,20 +20,23 @@ export function OwnerOperations() {
   if (!lot) return <div className="text-slate-400">Đang tải…</div>;
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">Vận hành bãi</h1>
-        <p className="text-sm text-slate-400">
-          {lot.name} · <span className="font-semibold text-brand-700">{lot.available_spots}/{lot.total_spots} chỗ trống</span>
-        </p>
+    <div className="animate-fade-in space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-[28px] font-extrabold tracking-tight text-slate-800">Vận hành bãi</h1>
+          <p className="mt-0.5 text-sm text-slate-500">{lot.name}</p>
+        </div>
+        <span className="glass-green inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold text-brand-700">
+          {lot.available_spots}/{lot.total_spots} chỗ trống
+        </span>
       </div>
 
-      <div className="card p-0">
-        <div className="flex border-b border-slate-100">
-          <TabBtn active={tab === 'checkin'} onClick={() => setTab('checkin')}>Check-in (Xe vào)</TabBtn>
-          <TabBtn active={tab === 'checkout'} onClick={() => setTab('checkout')}>Checkout (Xe ra)</TabBtn>
+      <div className="card overflow-hidden p-0">
+        <div className="flex gap-2 p-3">
+          <TabBtn active={tab === 'checkin'} onClick={() => setTab('checkin')}>↓ Check-in (Xe vào)</TabBtn>
+          <TabBtn active={tab === 'checkout'} onClick={() => setTab('checkout')}>↑ Checkout (Xe ra)</TabBtn>
         </div>
-        <div className="p-6">
+        <div className="px-6 pb-6 pt-2">
           {tab === 'checkin' ? (
             <CheckinPanel lot={lot} onDone={reload} />
           ) : (
@@ -49,8 +52,10 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
   return (
     <button
       onClick={onClick}
-      className={`flex-1 px-4 py-3 text-center font-semibold transition ${
-        active ? 'border-b-2 border-brand-600 text-brand-700' : 'text-slate-400 hover:text-slate-600'
+      className={`flex-1 rounded-2xl px-4 py-3 text-center font-bold transition-all duration-200 ${
+        active
+          ? 'bg-gradient-to-br from-brand-500 to-brand-600 text-white shadow-md'
+          : 'text-slate-400 hover:bg-white/50 hover:text-slate-600'
       }`}
     >
       {children}
@@ -141,7 +146,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
           <Line label="Vị trí" value={result.slot_label || ''} />
           <Line label="Giờ vào" value={formatClock(result.checkin_at)} />
         </div>
-        <button onClick={reset} className="btn-primary mt-5 w-full">Check-in xe khác</button>
+        <button onClick={reset} className="btn-green mt-5 w-full">Check-in xe khác</button>
       </div>
     );
   }
@@ -215,7 +220,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
           )}
         </div>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-        <button onClick={confirm} disabled={busy} className="btn-primary w-full">
+        <button onClick={confirm} disabled={busy} className="btn-green w-full">
           {busy ? 'Đang xử lý…' : 'Xác nhận xe vào'}
         </button>
       </div>
@@ -321,7 +326,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
         <p className="mt-2 text-slate-500">
           Phí: <b className="text-brand-700">{formatVnd(done.fee)}</b> · Thanh toán: {done.method}
         </p>
-        <button onClick={reset} className="btn-primary mt-5 w-full">Checkout xe khác</button>
+        <button onClick={reset} className="btn-green mt-5 w-full">Checkout xe khác</button>
       </div>
     );
   }
@@ -390,7 +395,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
                       onChange={(e) => setLookupPlate(e.target.value.toUpperCase())}
                       onKeyDown={(e) => e.key === 'Enter' && findByPlate()}
                     />
-                    <button onClick={findByPlate} className="btn-primary shrink-0">Tìm xe</button>
+                    <button onClick={findByPlate} className="btn-green shrink-0">Tìm xe</button>
                   </div>
                 </div>
               )}
@@ -421,7 +426,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
               />
             </div>
             {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-            <button onClick={confirm} disabled={busy} className="btn-primary w-full">
+            <button onClick={confirm} disabled={busy} className="btn-green w-full">
               {busy ? 'Đang xử lý…' : 'Xác nhận cho xe ra'}
             </button>
           </>

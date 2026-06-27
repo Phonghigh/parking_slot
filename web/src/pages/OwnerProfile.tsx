@@ -12,11 +12,17 @@ export function OwnerProfile() {
   if (!lot) return <div className="text-slate-400">Đang tải…</div>;
 
   return (
-    <div className="max-w-3xl space-y-5">
-      <h1 className="text-2xl font-extrabold text-slate-900">Hồ sơ bãi</h1>
+    <div className="animate-fade-in max-w-3xl space-y-5">
+      <h1 className="text-[28px] font-extrabold tracking-tight text-slate-800">Hồ sơ bãi</h1>
 
       <div className="card overflow-hidden">
-        <img src={lot.image_url} alt={lot.name} className="h-48 w-full object-cover" />
+        <div className="relative">
+          <img src={lot.image_url} alt={lot.name} className="h-52 w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+          <span className={`absolute bottom-3 left-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-white ${lot.is_open ? 'glass-green text-brand-800' : 'glass-white text-slate-700'}`}>
+            <span className={`h-2 w-2 rounded-full ${lot.is_open ? 'bg-brand-500' : 'bg-slate-400'}`} /> {lot.is_open ? 'Đang mở cửa' : 'Đã đóng cửa'}
+          </span>
+        </div>
         <div className="p-5">
           <h2 className="text-xl font-extrabold text-slate-900">{lot.name}</h2>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
