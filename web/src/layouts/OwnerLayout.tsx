@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { api, Lot } from '../api';
 import { IconLogout, IconQr, IconUser, IconWallet, IconHistory } from '../components/icons';
 
+const NAV = [
+  { to: '/owner', icon: IconWallet, label: 'Tổng quan', end: true },
+  { to: '/owner/operations', icon: IconQr, label: 'Vận hành' },
+  { to: '/owner/profile', icon: IconUser, label: 'Hồ sơ bãi' },
+];
+
 export function OwnerLayout() {
   const { user, logout } = useAuth();
+  const nav = useNavigate();
   const [lot, setLot] = useState<Lot | null>(null);
 
   useEffect(() => {
@@ -13,81 +20,97 @@ export function OwnerLayout() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-brand-50/40">
+    <div
+      className="relative flex min-h-screen"
+      style={{
+        background:
+          'radial-gradient(60% 50% at 12% 8%, rgba(0,177,79,0.12), transparent 60%),' +
+          'radial-gradient(55% 45% at 88% 28%, rgba(0,122,255,0.10), transparent 60%),' +
+          'radial-gradient(50% 45% at 60% 100%, rgba(0,212,106,0.10), transparent 60%), #F5F5F7',
+      }}
+    >
       {/* Sidebar */}
-      <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col bg-brand-700 px-4 py-6 text-white">
-        <div className="px-2">
-          <h1 className="text-xl font-extrabold">Parking Partners</h1>
-          <p className="text-sm text-brand-100/80">Cổng quản lý đối tác</p>
+      <aside className="owner-aside sticky top-0 z-10 flex h-screen w-[260px] shrink-0 flex-col px-4 py-6 text-white">
+        <div className="flex items-center gap-3 px-2">
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-xl font-black backdrop-blur">
+            P
+          </span>
+          <div>
+            <h1 className="text-lg font-extrabold leading-tight">ParkSmart</h1>
+            <p className="text-xs font-medium text-emerald-200/80">Partner Portal</p>
+          </div>
         </div>
 
-        <nav className="mt-8 space-y-1">
-          <Item to="/owner" icon={<IconWallet width={20} />} label="Tổng quan" end />
-          <Item to="/owner/operations" icon={<IconQr width={20} />} label="Vận hành (Check-in)" />
-          <Item to="/owner/profile" icon={<IconUser width={20} />} label="Hồ sơ bãi" />
+        <nav className="mt-9 space-y-1.5">
+          {NAV.map((n) => (
+            <NavLink
+              key={n.to}
+              to={n.to}
+              end={n.end}
+              className={({ isActive }) =>
+                `group flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition-all duration-200 ${
+                  isActive ? 'owner-navitem-active' : 'text-emerald-50/80 hover:bg-white/10 hover:text-white'
+                }`
+              }
+            >
+              <n.icon width={19} />
+              {n.label}
+            </NavLink>
+          ))}
         </nav>
 
         <div className="mt-auto space-y-3">
           {lot && (
-            <div className="rounded-xl bg-white/10 px-3 py-2 text-sm">
-              <p className="text-brand-100/70 text-xs">Bãi đang quản lý</p>
-              <p className="font-semibold leading-tight">{lot.name}</p>
+            <div className="rounded-2xl border border-white/10 bg-white/10 p-3.5 backdrop-blur">
+              <p className="flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-emerald-200/70">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" /> Bãi đang quản lý
+              </p>
+              <p className="mt-1 text-sm font-bold leading-snug">{lot.name}</p>
+              <p className="mt-0.5 truncate text-xs text-emerald-100/60">{lot.address}</p>
             </div>
           )}
-          <div className="flex items-center gap-3 px-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-white/15">
-              <IconUser width={18} />
+          <div className="flex items-center gap-3 rounded-2xl px-1 py-1">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 font-bold shadow-lg">
+              {user?.name?.[0] ?? 'O'}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">{user?.name}</p>
-              <p className="text-xs text-brand-100/70">@{user?.username}</p>
+              <p className="truncate text-sm font-semibold">{user?.name}</p>
+              <p className="truncate text-xs text-emerald-100/60">@{user?.username}</p>
             </div>
+            <button
+              onClick={() => { logout(); nav('/login', { replace: true }); }}
+              title="Đăng xuất"
+              className="grid h-9 w-9 place-items-center rounded-xl text-emerald-100/70 transition hover:bg-white/10 hover:text-white"
+            >
+              <IconLogout width={18} />
+            </button>
           </div>
-          <button onClick={logout} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-brand-100 hover:bg-white/10">
-            <IconLogout width={18} /> Đăng xuất
-          </button>
         </div>
       </aside>
 
       {/* Content */}
-      <div className="flex-1">
-        {/* Topbar */}
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white/90 px-8 py-3 backdrop-blur">
-          <div className="flex items-center gap-2 text-sm text-slate-500">
-            <span className="flex items-center gap-1.5 rounded-full bg-brand-50 px-3 py-1 font-medium text-brand-700">
-              <span className="h-2 w-2 rounded-full bg-brand-500" /> Hệ thống hoạt động
+      <div className="relative z-[1] flex min-h-screen flex-1 flex-col">
+        <header className="glass-header sticky top-0 z-10 flex items-center justify-between px-8 py-3.5">
+          <span className="glass-green inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold text-brand-700">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
             </span>
-          </div>
+            Hệ thống hoạt động
+          </span>
           <div className="flex items-center gap-3">
-            <NavLink to="/owner/operations" className="btn-primary px-4 py-2 text-sm">
+            <button onClick={() => nav('/owner/operations')} className="btn-green px-4 py-2 text-sm">
               <IconQr width={16} /> Check-in nhanh
-            </NavLink>
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 font-bold text-white">
-              {user?.name?.[0] ?? 'O'}
-            </span>
+            </button>
+            <button onClick={() => nav('/owner/profile')} className="glass-icon grid h-10 w-10 place-items-center rounded-full text-slate-600 transition active:scale-95">
+              <IconUser width={18} />
+            </button>
           </div>
         </header>
-        <main className="px-8 py-6">
+        <main className="flex-1 px-8 py-7">
           <Outlet />
         </main>
       </div>
     </div>
-  );
-}
-
-function Item({ to, icon, label, end }: { to: string; icon: React.ReactNode; label: string; end?: boolean }) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        `flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium transition ${
-          isActive ? 'bg-white text-brand-700' : 'text-brand-50 hover:bg-white/10'
-        }`
-      }
-    >
-      {icon}
-      {label}
-    </NavLink>
   );
 }
