@@ -4,6 +4,7 @@ import { QrScanner } from '../components/QrScanner';
 import { formatVnd, formatClock } from '../lib/format';
 import { readPlateFromImage } from '../lib/ocr';
 import { IconCamera, IconCheck, IconQr } from '../components/icons';
+import { PlateDisplay } from '../components/PlateDisplay';
 
 type Tab = 'checkin' | 'checkout';
 
@@ -93,9 +94,15 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     setOcrProgress(0);
     try {
       const text = await readPlateFromImage(f, setOcrProgress);
-      if (text) setPlate(text);
-    } catch {
-      /* OCR lỗi -> để người dùng gõ tay */
+      if (text) {
+        setPlate(text);
+      } else {
+        console.warn('[OCR] readPlateFromImage returned empty string — check cleanPlate logs above');
+        setError('OCR không nhận ra biển số — vui lòng nhập tay.');
+      }
+    } catch (e: any) {
+      console.error('[OCR] readPlateFromImage threw:', e);
+      setError(`OCR lỗi: ${e?.message ?? e}`);
     } finally {
       setOcrBusy(false);
     }
@@ -127,7 +134,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
         </div>
         <h3 className="mt-3 text-xl font-extrabold text-slate-900">Check-in thành công!</h3>
         <div className="mt-4 space-y-2 rounded-xl bg-slate-50 p-4 text-left text-sm">
-          <Line label="Biển số" value={<span className="plate">{result.plate}</span>} />
+          <Line label="Biển số" value={<PlateDisplay plate={result.plate} />} />
           <Line label="Vị trí" value={result.slot_label || ''} />
           <Line label="Giờ vào" value={formatClock(result.checkin_at)} />
         </div>

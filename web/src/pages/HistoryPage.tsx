@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, Session } from '../api';
 import { formatVnd, formatDateTime } from '../lib/format';
 import { IconHistory, IconStar } from '../components/icons';
+import { PlateDisplay } from '../components/PlateDisplay';
 
 const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wallet', cash: 'Tiền mặt' };
 
@@ -39,7 +40,7 @@ export function HistoryPage() {
                   <h3 className="truncate font-bold text-slate-800">{s.lot.name}</h3>
                   <p className="text-xs text-slate-500">{s.slot_label}</p>
                 </div>
-                <span className="plate ml-2 text-sm">{s.plate}</span>
+                <PlateDisplay plate={s.plate} className="ml-2 text-sm" />
               </div>
 
               <div className="mt-3 flex items-end justify-between border-t border-white/40 pt-3">

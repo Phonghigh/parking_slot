@@ -6,6 +6,7 @@ import { QrDisplay } from '../components/QrDisplay';
 import { PaymentSelector } from '../components/PaymentSelector';
 import { formatVnd, formatClock, formatDuration } from '../lib/format';
 import { IconBell, IconCheck, IconTicket } from '../components/icons';
+import { PlateDisplay } from '../components/PlateDisplay';
 
 const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wallet', cash: 'tiền mặt' };
 
@@ -105,7 +106,7 @@ export function TicketPage() {
                 s.id === selected.id ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white'
               }`}
             >
-              <span className="plate text-sm">{s.plate}</span>
+              <PlateDisplay plate={s.plate} className="text-sm" />
               <span className="max-w-[7rem] truncate text-xs text-slate-400">{s.lot.name}</span>
             </button>
           ))}
@@ -164,7 +165,7 @@ function ActiveTicket({
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Biển số xe</p>
-            <span className="plate mt-1 text-base">{session.plate}</span>
+            <PlateDisplay plate={session.plate} className="mt-1 text-base" />
           </div>
         </div>
 
