@@ -1,6 +1,9 @@
 import { db, initSchema } from './db.js';
 import { computeFee, generateSlotLabel, randomToken, shortCode } from './lib.js';
+import { pathToFileURL } from 'node:url';
 
+// Seed toàn bộ dữ liệu demo (xoá sạch rồi tạo lại). Gọi từ CLI hoặc auto-seed khi DB rỗng.
+export function runSeed() {
 initSchema();
 
 // Xoá dữ liệu cũ (giữ schema)
@@ -252,3 +255,9 @@ c1.forEach(({ lot, plate, ago }) => {
 console.log(`Seed xong: ${lots.length} bãi (mỗi bãi 1 owner), ${guestIds.length} guest, 29 phiên cho bãi "${demoLot.name}".`);
 console.log('commuter1 đang gửi 2 xe:', c1.map((x) => x.plate).join(', '));
 console.log('Demo: commuter1/123456 · owner1/123456 (quản lý "' + demoLot.name + '") · owner2..owner12/123456');
+}
+
+// Chạy seed khi gọi trực tiếp: `node src/seed.js`
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  runSeed();
+}

@@ -1,4 +1,6 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
+const BASE =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? 'http://localhost:4000/api' : '/api');
 
 const TOKEN_KEY = 'gopark_token';
 

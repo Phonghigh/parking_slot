@@ -11,4 +11,5 @@ server/parking.db-*
 
 # Vite / PWA
 web/dev-dist/
+web/vite.config.js
 .DS_Store

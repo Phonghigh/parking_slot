@@ -1,0 +1,13 @@
+# Render Blueprint — GoPark (single service: Express phục vụ PWA build + API)
+services:
+  - type: web
+    name: gopark
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
