@@ -75,6 +75,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
   const [busy, setBusy] = useState(false);
   const [ocrBusy, setOcrBusy] = useState(false);
   const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrMsg, setOcrMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -84,6 +85,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     setResult(null);
     setError('');
     setOcrBusy(false);
+    setOcrMsg('');
   };
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,6 +94,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     setPhoto(URL.createObjectURL(f));
     setOcrBusy(true);
     setOcrProgress(0);
+    setOcrMsg('');
     try {
       const text = await readPlateFromImage(f, setOcrProgress);
       if (text) {
@@ -204,8 +207,11 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
             value={plate}
             onChange={(e) => setPlate(e.target.value.toUpperCase())}
           />
-          {photo && !ocrBusy && (
+          {!ocrBusy && ocrMsg === 'ok' && (
             <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh — sửa lại nếu chưa đúng.</p>
+          )}
+          {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
+            <p className="mt-1 text-xs text-amber-600">⚠ {ocrMsg}</p>
           )}
         </div>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
@@ -249,9 +255,35 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
     }
   };
 
-  // DỰ PHÒNG: khách mất / hết pin điện thoại -> tra theo biển số
+  // DỰ PHÒNG: khách mất / hết pin điện thoại -> tra theo biển số (gõ tay hoặc chụp ảnh + OCR)
   const [lookupPlate, setLookupPlate] = useState('');
   const [fallback, setFallback] = useState(false);
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrMsg, setOcrMsg] = useState('');
+  const fbFileRef = useRef<HTMLInputElement>(null);
+
+  const onPlatePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setOcrBusy(true);
+    setOcrProgress(0);
+    setOcrMsg('');
+    try {
+      const text = await readPlateFromImage(f, setOcrProgress);
+      if (text) {
+        setLookupPlate(text);
+        setOcrMsg('ok');
+      } else {
+        setOcrMsg('Không đọc được biển số — vui lòng gõ tay.');
+      }
+    } catch {
+      setOcrMsg('Lỗi xử lý ảnh — vui lòng gõ tay.');
+    } finally {
+      setOcrBusy(false);
+    }
+  };
+
   const findByPlate = async () => {
     if (!lookupPlate.trim()) return;
     setError('');
@@ -325,8 +357,31 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
               {fallback && (
                 <div className="mt-2">
                   <p className="mb-2 text-xs text-amber-700/80">
-                    Tra phiên đang gửi theo <b>biển số xe</b> (xác minh thêm bằng CCCD / cà vẹt xe).
+                    Tra phiên đang gửi theo <b>biển số xe</b> — chụp ảnh để OCR tự đọc hoặc gõ tay
+                    (xác minh thêm bằng CCCD / cà vẹt xe).
                   </p>
+
+                  {/* Chụp ảnh biển số + OCR */}
+                  <div
+                    onClick={() => !ocrBusy && fbFileRef.current?.click()}
+                    className="relative mb-2 flex min-h-[5rem] cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-amber-300 bg-white py-4 text-amber-600"
+                  >
+                    <IconCamera width={18} /> Chụp / tải ảnh biển số (OCR)
+                    {ocrBusy && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-xl bg-white/85 text-brand-700">
+                        <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+                        <span className="text-xs font-medium">Đang đọc biển số… {Math.round(ocrProgress * 100)}%</span>
+                      </div>
+                    )}
+                  </div>
+                  <input ref={fbFileRef} type="file" accept="image/*" capture="environment" hidden onChange={onPlatePhoto} />
+                  {!ocrBusy && ocrMsg === 'ok' && (
+                    <p className="mb-2 text-xs text-brand-600">✓ Đã đọc từ ảnh — kiểm tra lại bên dưới.</p>
+                  )}
+                  {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
+                    <p className="mb-2 text-xs text-amber-700">⚠ {ocrMsg}</p>
+                  )}
+
                   <div className="flex gap-2">
                     <input
                       className="input bg-white font-mono uppercase"
