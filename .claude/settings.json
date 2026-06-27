@@ -3,7 +3,10 @@
     "allow": [
       "Skill(update-config)",
       "Skill(update-config:*)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)"
     ]
   },
   "hooks": {
