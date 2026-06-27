@@ -76,7 +76,7 @@ export function CommuterLayout() {
       </main>
 
       <nav className="glass-nav fixed bottom-5 left-1/2 z-20 mx-auto w-[88%] max-w-sm -translate-x-1/2 rounded-full px-3 py-2">
-        <div className="relative flex items-center justify-around">
+        <div className="relative flex items-center justify-evenly">
           {blobReady && (
             <div
               className={`blob-indicator${blob.phase === 'land' ? ' landing' : ''}`}

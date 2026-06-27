@@ -11,7 +11,12 @@
       "Bash(python3 ~/.claude/skills/ui-ux-pro-max/scripts/search.py \"smart city parking navigation enterprise minimal\" --design-system -p \"ParkHub\")",
       "Bash(find ~/.claude/skills/ui-ux-pro-max -name \"*.py\" 2>/dev/null | head -5)",
       "Read(//home/fionn/.claude/skills/ui-ux-pro-max/**)",
-      "Bash(ls ~/.claude/skills/ui-ux-pro-max/ 2>/dev/null)"
+      "Bash(ls ~/.claude/skills/ui-ux-pro-max/ 2>/dev/null)",
+      "Bash(mkdir -p /home/fionn/.claude/skills/liquid-glass)",
+      "Edit(~/.claude/skills/liquid-glass/**)"
+    ],
+    "additionalDirectories": [
+      "/home/fionn/.claude/skills"
     ]
   },
   "hooks": {

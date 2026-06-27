@@ -170,16 +170,13 @@
 
   /* ── Liquid Glass active filter pill ─────────────────────────── */
   .pill-active {
-    background: linear-gradient(170deg, rgba(255,255,255,0.50) 0%, rgba(0,177,79,0.38) 100%);
-    backdrop-filter: blur(20px) saturate(200%);
-    -webkit-backdrop-filter: blur(20px) saturate(200%);
-    border: 1px solid rgba(255, 255, 255, 0.70);
+    background: linear-gradient(170deg, rgba(255,255,255,0.70) 0%, rgba(0,177,79,0.28) 100%);
+    border: 1px solid rgba(0, 177, 79, 0.35);
     box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.90),
-      inset 0 -1px 0 rgba(0, 177, 79, 0.20),
-      0 4px 16px rgba(0, 177, 79, 0.28),
-      0 1px 3px rgba(0, 0, 0, 0.06);
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(0, 177, 79, 0.15);
     color: #007A35;
+    outline: none;
   }
 
   /* ── Icon container backgrounds ───────────────────────────────── */
@@ -293,6 +290,15 @@
   height: 100%;
   width: 100%;
   z-index: 0;
+}
+
+/* ── Map marker float animation ───────────────────────────────── */
+@keyframes marker-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+.marker-float {
+  animation: marker-float 2.2s ease-in-out infinite;
 }
 
 /* ── Scrollbar ────────────────────────────────────────────────── */

@@ -131,7 +131,7 @@ export function MapPage() {
 
         {/* Mini preview card */}
         {activeLot && (
-          <div className="absolute bottom-4 left-4 right-4 z-[1000] animate-fade-slide-up">
+          <div className="absolute bottom-8 left-4 right-4 z-[1000] animate-fade-slide-up">
             <MiniLotCard
               lot={activeLot}
               onClose={() => setActiveLot(undefined)}

@@ -9,18 +9,43 @@ import { capacityColor, priceLabel } from '../lib/format';
 
 function lotIcon(lot: Lot, active: boolean) {
   const cap = capacityColor(lot.available_spots, lot.total_spots);
-  const border = active ? `2px solid #00B14F` : `2px solid #fff`;
+  const scale = active ? 'scale(1.12)' : 'scale(1)';
+  const ring = active ? `0 0 0 2.5px #fff, 0 0 0 4px ${cap.color}` : 'none';
+  const shadow = `0 4px 16px ${cap.color}66, 0 1px 4px rgba(0,0,0,0.20)`;
+
   return L.divIcon({
     className: '',
     html: `
-      <div style="transform: translate(-50%, -100%); display:flex; flex-direction:column; align-items:center;">
-        <div style="background:${cap.color}; color:#fff; font-weight:700; font-size:12px;
-             padding:4px 10px; border-radius:999px; white-space:nowrap;
-             box-shadow:0 3px 10px rgba(0,0,0,.3); border:${border};">
-          ${priceLabel(lot)} · ${lot.available_spots} chỗ
+      <div style="transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center;">
+        <div class="${active ? 'marker-float' : ''}" style="display:flex; flex-direction:column; align-items:center;">
+          <div style="
+            background: linear-gradient(170deg, rgba(255,255,255,0.28) 0%, rgba(0,0,0,0.10) 100%), ${cap.color};
+            border: 1.5px solid rgba(255,255,255,0.50);
+            border-radius: 999px;
+            padding: 5px 12px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.30);
+            white-space: nowrap;
+            transform: ${scale};
+            box-shadow:
+              inset 0 1.5px 0 rgba(255,255,255,0.65),
+              inset 0 -1px 0 rgba(0,0,0,0.12),
+              ${ring !== 'none' ? ring + ',' : ''}
+              ${shadow};
+          ">
+            ${priceLabel(lot)} · ${lot.available_spots} chỗ
+          </div>
+          <div style="
+            width:0; height:0;
+            border-left:5px solid transparent;
+            border-right:5px solid transparent;
+            border-top:7px solid ${cap.color};
+            margin-top:-1px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22));
+          "></div>
         </div>
-        <div style="width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
-             border-top:7px solid ${cap.color};margin-top:-1px;"></div>
       </div>`,
     iconSize: [0, 0],
   });
@@ -76,7 +101,7 @@ export function MapView({
   onMapClick?: () => void;
 }) {
   return (
-    <MapContainer center={center} zoom={14} zoomControl={false} className="h-full w-full">
+    <MapContainer center={center} zoom={14} zoomControl={false} attributionControl={false} className="h-full w-full">
       <TileLayer
         attribution='&copy; OpenStreetMap'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
