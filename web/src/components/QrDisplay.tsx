@@ -3,16 +3,20 @@ import { QRCodeSVG } from 'qrcode.react';
 import { IconRefresh } from './icons';
 
 /**
- * Hiển thị QR trong khung scanner (corner brackets) + đếm ngược auto-refresh.
- * value: nội dung QR. refreshSeconds: chu kỳ tự làm mới (cosmetic + đổi nonce).
+ * Hiển thị QR trong khung scanner (corner brackets).
+ * - autoRefresh=true: đếm ngược + tự đổi nonce mỗi refreshSeconds.
+ * - autoRefresh=false: mã cố định, chỉ làm mới khi bấm nút.
+ * Nonce được nối sau dấu '#'; phía quét luôn cắt bỏ phần '#...' nên không ảnh hưởng nội dung.
  */
 export function QrDisplay({
   value,
   refreshSeconds = 30,
+  autoRefresh = true,
   onRefresh,
 }: {
   value: string;
   refreshSeconds?: number;
+  autoRefresh?: boolean;
   onRefresh?: () => void;
 }) {
   const [left, setLeft] = useState(refreshSeconds);
@@ -23,6 +27,7 @@ export function QrDisplay({
   }, [value, nonce, refreshSeconds]);
 
   useEffect(() => {
+    if (!autoRefresh) return;
     const t = setInterval(() => {
       setLeft((s) => {
         if (s <= 1) {
@@ -34,7 +39,7 @@ export function QrDisplay({
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [refreshSeconds, onRefresh]);
+  }, [refreshSeconds, onRefresh, autoRefresh]);
 
   const refreshNow = () => {
     setNonce((n) => n + 1);
@@ -52,9 +57,15 @@ export function QrDisplay({
         <Corner className="bottom-2 right-2 border-b-4 border-r-4" />
         <QRCodeSVG value={`${value}#${nonce}`} size={180} level="M" fgColor="#0f172a" bgColor="transparent" />
       </div>
-      <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-sm text-slate-500">
-        <IconClockTiny /> Tự động làm mới sau <span className="font-semibold text-slate-700">{left}s</span>
-      </div>
+      {autoRefresh ? (
+        <div className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-sm text-slate-500">
+          <IconClockTiny /> Tự động làm mới sau <span className="font-semibold text-slate-700">{left}s</span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1.5 text-sm text-brand-700">
+          Mã cố định
+        </div>
+      )}
       <button onClick={refreshNow} className="btn-outline w-full">
         <IconRefresh width={18} /> Làm mới mã QR
       </button>

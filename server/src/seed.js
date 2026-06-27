@@ -92,13 +92,19 @@ const insertSession = db.prepare(`
 
 const HOUR = 60 * 60 * 1000;
 const now = Date.now();
-const plates = ['51F-123.45', '59P1-678.90', '60B2-334.21', '72H1-998.10', '29X3-112.78',
-  '43K1-556.32', '51G-447.81', '63B5-220.09', '92F1-873.44', '50A-661.27',
-  '77M1-304.55', '38H2-781.63', '51F-999.01', '66C1-145.78', '47P3-852.36'];
 const methods = ['momo', 'wallet', 'cash'];
 
-let plateIdx = 0;
-const nextPlate = () => plates[plateIdx++ % plates.length];
+// Sinh biển số DUY NHẤT cho mỗi phiên (tránh 1 xe vừa "đã ra" vừa "đang gửi")
+const platePrefixes = ['51F', '59P1', '60B2', '72H1', '29X3', '43K1', '51G', '63B5',
+  '92F1', '50A', '77M1', '38H2', '66C1', '47P3', '30F', '61C', '86B', '79N', '43A', '51H'];
+let plateSeq = 0;
+const nextPlate = () => {
+  const pre = platePrefixes[plateSeq % platePrefixes.length];
+  const num = 100 + plateSeq; // duy nhất theo từng phiên
+  const dd = 10 + (plateSeq * 13) % 90;
+  plateSeq++;
+  return `${pre}-${num}.${dd}`;
+};
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 // 26 phiên đã hoàn tất rải đều trong 48h qua (để có dữ liệu cả hôm nay & hôm qua)

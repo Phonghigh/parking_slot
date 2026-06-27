@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, Lot, Session } from '../api';
 import { QrScanner } from '../components/QrScanner';
 import { formatVnd, formatClock } from '../lib/format';
+import { readPlateFromImage } from '../lib/ocr';
 import { IconCamera, IconCheck, IconQr } from '../components/icons';
 
 type Tab = 'checkin' | 'checkout';
@@ -58,7 +59,9 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
 
 /* ---------------- Check-in ---------------- */
 function parseUserId(text: string): number | null {
-  const m = text.match(/(\d+)\s*$/);
+  // Cắt bỏ phần '#nonce' (nếu có) rồi lấy số định danh ở cuối: "PARKSMART-CHECKIN:1" -> 1
+  const base = text.split('#')[0].trim();
+  const m = base.match(/(\d+)\s*$/);
   return m ? Number(m[1]) : null;
 }
 
@@ -69,6 +72,8 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
   const [result, setResult] = useState<Session | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [ocrBusy, setOcrBusy] = useState(false);
+  const [ocrProgress, setOcrProgress] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -77,11 +82,23 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     setPhoto(null);
     setResult(null);
     setError('');
+    setOcrBusy(false);
   };
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
-    if (f) setPhoto(URL.createObjectURL(f));
+    if (!f) return;
+    setPhoto(URL.createObjectURL(f));
+    setOcrBusy(true);
+    setOcrProgress(0);
+    try {
+      const text = await readPlateFromImage(f, setOcrProgress);
+      if (text) setPlate(text);
+    } catch {
+      /* OCR lỗi -> để người dùng gõ tay */
+    } finally {
+      setOcrBusy(false);
+    }
   };
 
   const confirm = async () => {
@@ -123,20 +140,22 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     <div className="grid gap-6 md:grid-cols-2">
       <div>
         <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
-          <Num n={1} /> Quét QR định danh người dùng
+          <Num n={1} /> Quét mã QR định danh của khách
         </h4>
         {userId ? (
           <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-brand-700">
-            <IconQr width={18} /> Đã nhận diện người dùng <b>#{userId}</b>
+            <IconQr width={18} /> Đã nhận diện khách <b>#{userId}</b>
             <button onClick={() => setUserId(null)} className="ml-auto text-sm underline">Quét lại</button>
           </div>
         ) : (
           <QrScanner
-            manualPlaceholder="Nhập mã người dùng (số)"
+            hint="Khách mở app ParkSmart → tab Tài khoản → “Mã QR Check-in” để bạn quét. Không quét được? Nhập số định danh của khách bên dưới (vd: 1)."
+            manualLabel="Hoặc nhập số định danh khách"
+            manualPlaceholder="vd: 1"
             onResult={(t) => {
               const id = parseUserId(t);
               if (id) setUserId(id);
-              else setError('QR không hợp lệ');
+              else setError('Mã không hợp lệ');
             }}
           />
         )}
@@ -145,11 +164,14 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
       <div className="space-y-4">
         <div>
           <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
-            <Num n={2} /> Chụp biển số xe
+            <Num n={2} /> Biển số xe
           </h4>
+          <p className="mb-2 text-xs text-slate-400">
+            Tải ảnh biển số → hệ thống <b>tự đọc (OCR)</b> rồi điền vào ô bên dưới. Vui lòng kiểm tra lại.
+          </p>
           <div
-            onClick={() => fileRef.current?.click()}
-            className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-6 text-slate-400 hover:border-brand-300"
+            onClick={() => !ocrBusy && fileRef.current?.click()}
+            className="relative flex min-h-[7rem] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-6 text-slate-400 hover:border-brand-300"
           >
             {photo ? (
               <img src={photo} alt="biển số" className="h-24 rounded-lg object-cover" />
@@ -158,17 +180,26 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
                 <IconCamera /> Tải ảnh biển số
               </>
             )}
+            {ocrBusy && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/85 text-brand-700">
+                <span className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+                <span className="text-sm font-medium">Đang đọc biển số… {Math.round(ocrProgress * 100)}%</span>
+              </div>
+            )}
           </div>
           <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
         </div>
         <div>
-          <label className="label">Biển số (nhập tay)</label>
+          <label className="label">Biển số (kiểm tra / sửa) *</label>
           <input
             className="input font-mono uppercase tracking-wide"
             placeholder="51F-123.45"
             value={plate}
             onChange={(e) => setPlate(e.target.value.toUpperCase())}
           />
+          {photo && !ocrBusy && (
+            <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh — sửa lại nếu chưa đúng.</p>
+          )}
         </div>
         {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
         <button onClick={confirm} disabled={busy} className="btn-primary w-full">
@@ -252,7 +283,12 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
             <IconQr width={18} className="mb-1" /> Đã tìm thấy phiên #{session.id}
           </div>
         ) : (
-          <QrScanner manualPlaceholder="Nhập mã checkout" onResult={onScan} />
+          <QrScanner
+            hint="Khách mở tab “Vé của tôi” → “Mã QR Checkout” để bạn quét. Không quét được? Nhập mã checkout bên dưới."
+            manualLabel="Hoặc nhập mã checkout"
+            manualPlaceholder="Mã checkout"
+            onResult={onScan}
+          />
         )}
       </div>
 

@@ -21,7 +21,7 @@ export function CheckinQrPage() {
         </p>
 
         <div className="mt-6">
-          <QrDisplay value={value} refreshSeconds={30} />
+          <QrDisplay value={value} autoRefresh={false} />
         </div>
 
         <div className="mt-5 rounded-xl bg-brand-50 px-4 py-3 text-left text-sm text-brand-700">

@@ -210,7 +210,7 @@ function ActivityRow({ e }: { e: ActivityEvent }) {
       <div className="text-right">
         <p className="text-sm text-slate-500">{formatClock(e.ts)}</p>
         <p className={`text-xs font-medium ${isIn && e.status === 'active' ? 'text-brand-600' : 'text-slate-400'}`}>
-          {isIn ? (e.status === 'active' ? 'Đang gửi' : 'Hoàn tất') : formatVnd(e.fee)}
+          {isIn ? (e.status === 'active' ? 'Đang gửi' : 'Đã vào bãi') : formatVnd(e.fee)}
         </p>
       </div>
     </div>
