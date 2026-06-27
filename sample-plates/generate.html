@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tạo ảnh biển số test OCR — ParkSmart</title>
+  <style>
+    body { font-family: Arial, system-ui, sans-serif; background:#f1f5f9; margin:0; padding:24px; color:#0f172a; }
+    h1 { font-size:20px; }
+    .row { display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:16px; }
+    label { display:block; font-size:13px; color:#475569; margin-bottom:4px; }
+    input { padding:10px 12px; border:1px solid #cbd5e1; border-radius:10px; font-size:16px; width:120px; }
+    button { padding:10px 16px; border:0; border-radius:10px; background:#00B14F; color:#fff; font-weight:700; cursor:pointer; }
+    button.alt { background:#fff; color:#0f172a; border:1px solid #cbd5e1; }
+    canvas { background:#fff; border:1px solid #e2e8f0; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    .grid { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; }
+    .card { text-align:center; }
+    .hint { color:#64748b; font-size:13px; max-width:640px; line-height:1.5; }
+  </style>
+</head>
+<body>
+  <h1>🅿️ Tạo ảnh biển số (PNG) để test OCR</h1>
+  <p class="hint">Nhập 2 dòng biển số → Tạo → Tải PNG. Ảnh nền trắng, chữ đen rõ, đúng kiểu OCR đọc tốt nhất.
+  Sau đó tải ảnh này lên ở tab <b>Check-in</b> hoặc mục <b>dự phòng Checkout</b> trong app.</p>
+
+  <div class="row">
+    <div><label>Dòng 1</label><input id="l1" value="59-V1" /></div>
+    <div><label>Dòng 2</label><input id="l2" value="793.79" /></div>
+    <button onclick="makeOne()">Tạo ảnh</button>
+  </div>
+
+  <div class="card">
+    <canvas id="cv" width="460" height="320"></canvas><br/>
+    <button class="alt" style="margin-top:8px" onclick="download()">⬇ Tải PNG</button>
+  </div>
+
+  <h3>Mẫu có sẵn</h3>
+  <div class="grid" id="samples"></div>
+
+  <script>
+    const SAMPLES = [['59-V1','793.79'],['29-X3','112.78'],['51-F8','234.56'],['60-B2','555.99'],['43-K1','678.90']];
+
+    function draw(ctx, l1, l2) {
+      const W = ctx.canvas.width, H = ctx.canvas.height;
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,W,H);
+      ctx.strokeStyle = '#111'; ctx.lineWidth = 7; ctx.strokeRect(12,12,W-24,H-24);
+      ctx.fillStyle = '#0d0d0d'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.font = 'bold 100px Arial'; ctx.fillText(l1, W/2, H*0.33);
+      ctx.font = 'bold 112px Arial'; ctx.fillText(l2, W/2, H*0.70);
+    }
+    function makeOne() {
+      const c = document.getElementById('cv');
+      draw(c.getContext('2d'), document.getElementById('l1').value, document.getElementById('l2').value);
+    }
+    function download() {
+      const c = document.getElementById('cv');
+      const a = document.createElement('a');
+      a.download = 'bien-' + document.getElementById('l1').value + '-' + document.getElementById('l2').value + '.png';
+      a.href = c.toDataURL('image/png');
+      a.click();
+    }
+    function renderSamples() {
+      const box = document.getElementById('samples');
+      SAMPLES.forEach(([a,b]) => {
+        const wrap = document.createElement('div'); wrap.className = 'card';
+        const c = document.createElement('canvas'); c.width = 230; c.height = 160;
+        draw(c.getContext('2d'), a, b);
+        const btn = document.createElement('button'); btn.className = 'alt'; btn.textContent = '⬇ ' + a + ' ' + b;
+        btn.style.marginTop = '6px'; btn.style.display = 'block'; btn.style.width = '100%';
+        btn.onclick = () => {
+          const full = document.createElement('canvas'); full.width = 460; full.height = 320;
+          draw(full.getContext('2d'), a, b);
+          const link = document.createElement('a');
+          link.download = 'bien-' + a + '-' + b + '.png'; link.href = full.toDataURL('image/png'); link.click();
+        };
+        wrap.appendChild(c); wrap.appendChild(btn); box.appendChild(wrap);
+      });
+    }
+    makeOne(); renderSamples();
+  </script>
+</body>
+</html>
