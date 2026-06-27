@@ -1,0 +1,11 @@
+*/node_modules/
+dist/
+*.log
+
+# SQLite database (sinh ra khi seed)
+server/parking.db
+server/parking.db-*
+
+# Vite / PWA
+web/dev-dist/
+.DS_Store
