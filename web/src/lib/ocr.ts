@@ -25,9 +25,10 @@ export async function readPlateFromImage(
 
   console.log('[OCR] raw text:', JSON.stringify(data.text));
   console.log('[OCR] confidence:', data.confidence);
-  if (data.words?.length) {
+  const words = (data as any).words;
+  if (words?.length) {
     console.table(
-      data.words.map((w: any) => ({ text: w.text, confidence: w.confidence.toFixed(1) }))
+      words.map((w: any) => ({ text: w.text, confidence: w.confidence.toFixed(1) }))
     );
   }
 

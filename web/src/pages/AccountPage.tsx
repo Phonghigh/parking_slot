@@ -13,7 +13,7 @@ export function AccountPage() {
   };
 
   return (
-    <div className="min-h-full animate-fade-in px-4 py-6">
+    <div className="min-h-full animate-fade-in px-4 pt-6 pb-32">
       <h1 className="mb-5 text-xl font-extrabold text-slate-800">Tài khoản</h1>
 
       {/* Profile card */}

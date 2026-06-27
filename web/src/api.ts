@@ -35,9 +35,11 @@ export interface User {
 
 export interface Review {
   id: number;
+  user_id?: number | null;
   user_name: string;
   rating: number;
   comment: string;
+  updated_at?: number | null;
 }
 
 export interface Lot {
@@ -129,6 +131,11 @@ export const api = {
     return request<{ lots: Lot[] }>(`/lots${q}`);
   },
   getLot: (id: number) => request<{ lot: Lot }>(`/lots/${id}`),
+  submitReview: (lotId: number, rating: number, comment: string) =>
+    request<{ lot: Lot; edited: boolean }>(`/lots/${lotId}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify({ rating, comment }),
+    }),
   ownerLots: () => request<{ lots: Lot[] }>('/owner/lots'),
   ownerLot: () => request<{ lot: Lot }>('/owner/lot'),
   ownerStats: () => request<{ lot: Lot; stats: OwnerStats }>('/owner/stats'),

@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api, Lot } from '../api';
 import { formatDistance, priceLabel } from '../lib/format';
+import { subscribeLotUpdates } from '../lib/liveEvents';
+import { useAuth } from '../auth/AuthContext';
+import type { Review } from '../api';
 import {
   IconBack, IconShare, IconPin, IconStar, IconDirections, IconQr, IconCalendar,
   IconCamera, IconRoof, IconBolt, IconShield, IconClock,
@@ -19,11 +22,24 @@ const AMENITY_ICON: Record<string, JSX.Element> = {
 export function LotDetail() {
   const { id } = useParams();
   const nav = useNavigate();
+  const { user } = useAuth();
   const [lot, setLot] = useState<Lot | null>(null);
 
   useEffect(() => {
     if (id) api.getLot(Number(id)).then((r) => setLot(r.lot));
   }, [id]);
+
+  // Real-time: cập nhật chỗ trống live khi đang xem chi tiết
+  useEffect(() => {
+    const unsub = subscribeLotUpdates((u) => {
+      setLot((prev) =>
+        prev && prev.id === u.id
+          ? { ...prev, available_spots: u.available_spots, is_open: u.is_open }
+          : prev
+      );
+    });
+    return unsub;
+  }, []);
 
   if (!lot)
     return (
@@ -109,8 +125,18 @@ export function LotDetail() {
         {/* Reviews */}
         <section className="mt-6">
           <h2 className="font-bold text-slate-800">Đánh giá từ người dùng</h2>
+
+          {/* Form viết / sửa đánh giá của chính mình */}
+          <ReviewForm
+            lotId={lot.id}
+            existing={lot.reviews?.find((r) => r.user_id === user?.id) ?? null}
+            onSaved={(updated) => setLot((prev) => (prev ? { ...prev, ...updated } : updated))}
+          />
+
           <div className="mt-3 space-y-3">
-            {(lot.reviews ?? []).map((r) => (
+            {(lot.reviews ?? [])
+              .filter((r) => r.user_id !== user?.id)
+              .map((r) => (
               <div key={r.id} className="glass-surface flex gap-3 rounded-3xl p-3">
                 <div className="glass-icon grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold text-slate-600">
                   {r.user_name.split(' ').map((w) => w[0]).slice(-2).join('')}
@@ -162,6 +188,79 @@ function Stat({ top, bottom, divider }: { top: React.ReactNode; bottom: string; 
     <div className={`px-2 ${divider ? 'border-l border-white/50' : ''}`}>
       <div className="text-lg font-extrabold">{top}</div>
       <div className="mt-0.5 text-[11px] uppercase tracking-wide text-slate-400">{bottom}</div>
+    </div>
+  );
+}
+
+/** Form viết / sửa đánh giá của chính người dùng (mỗi acc 1 đánh giá / bãi). */
+function ReviewForm({
+  lotId,
+  existing,
+  onSaved,
+}: {
+  lotId: number;
+  existing: Review | null;
+  onSaved: (lot: Lot) => void;
+}) {
+  const [rating, setRating] = useState(existing?.rating ?? 5);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState(existing?.comment ?? '');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    setRating(existing?.rating ?? 5);
+    setComment(existing?.comment ?? '');
+  }, [existing?.id]);
+
+  const submit = async () => {
+    setBusy(true);
+    setMsg('');
+    try {
+      const r = await api.submitReview(lotId, rating, comment);
+      onSaved(r.lot);
+      setMsg(r.edited ? '✓ Đã cập nhật đánh giá của bạn' : '✓ Cảm ơn đánh giá của bạn!');
+    } catch (e: any) {
+      setMsg(e.message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="glass-surface mt-3 rounded-3xl p-4">
+      <p className="text-sm font-semibold text-slate-700">
+        {existing ? 'Sửa đánh giá của bạn' : 'Đánh giá bãi này'}
+      </p>
+      <div className="mt-2 flex items-center gap-1" onMouseLeave={() => setHover(0)}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setRating(n)}
+            onMouseEnter={() => setHover(n)}
+            className="p-0.5 transition active:scale-90"
+            aria-label={`${n} sao`}
+          >
+            <IconStar
+              width={26}
+              className={(hover || rating) >= n ? 'text-amber-400' : 'text-slate-300'}
+            />
+          </button>
+        ))}
+        <span className="ml-1 text-sm font-medium text-slate-500">{rating}/5</span>
+      </div>
+      <textarea
+        className="input mt-3 min-h-[64px] resize-none bg-white/70"
+        placeholder="Chia sẻ trải nghiệm của bạn (tuỳ chọn)…"
+        maxLength={500}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+      {msg && <p className="mt-2 text-sm font-medium text-brand-600">{msg}</p>}
+      <button onClick={submit} disabled={busy} className="btn-primary mt-3 w-full">
+        {busy ? 'Đang gửi…' : existing ? 'Cập nhật đánh giá' : 'Gửi đánh giá'}
+      </button>
     </div>
   );
 }

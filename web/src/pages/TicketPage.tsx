@@ -80,7 +80,7 @@ export function TicketPage() {
   const selected = actives.find((s) => s.id === selectedId) ?? actives[0];
 
   return (
-    <div className="space-y-4 px-4 py-4">
+    <div className="space-y-4 px-4 pt-4 pb-32">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-3 w-3 rounded-full bg-brand-600" />

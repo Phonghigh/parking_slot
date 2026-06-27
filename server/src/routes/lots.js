@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { haversineKm } from '../lib.js';
-import { requireRole } from '../auth.js';
+import { requireRole, requireAuth } from '../auth.js';
+import { broadcastLot } from '../events.js';
 
 const router = Router();
 
@@ -12,6 +13,21 @@ function serializeLot(lot) {
     is_open: !!lot.is_open,
     amenities: lot.amenities ? lot.amenities.split('|').filter(Boolean) : [],
   };
+}
+
+function loadReviews(lotId) {
+  return db
+    .prepare(
+      'SELECT id, user_id, user_name, rating, comment, updated_at FROM reviews WHERE lot_id = ? ORDER BY COALESCE(updated_at, 0) DESC, id DESC'
+    )
+    .all(lotId);
+}
+
+// Tính lại rating trung bình + số đánh giá của bãi sau khi review thay đổi
+function recomputeLotRating(lotId) {
+  const agg = db.prepare('SELECT COUNT(*) c, AVG(rating) a FROM reviews WHERE lot_id = ?').get(lotId);
+  const rating = agg.c > 0 ? Math.round(agg.a * 10) / 10 : 0;
+  db.prepare('UPDATE lots SET rating = ?, review_count = ? WHERE id = ?').run(rating, agg.c, lotId);
 }
 
 // GET /api/lots?lat=&lng=  → danh sách bãi + distance
@@ -33,10 +49,36 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const lot = db.prepare('SELECT * FROM lots WHERE id = ?').get(req.params.id);
   if (!lot) return res.status(404).json({ error: 'Không tìm thấy bãi' });
-  const reviews = db
-    .prepare('SELECT id, user_name, rating, comment FROM reviews WHERE lot_id = ?')
-    .all(lot.id);
-  res.json({ lot: { ...serializeLot(lot), reviews } });
+  res.json({ lot: { ...serializeLot(lot), reviews: loadReviews(lot.id) } });
+});
+
+// POST /api/lots/:id/reviews → tạo HOẶC sửa đánh giá (mỗi commuter 1 đánh giá / bãi)
+router.post('/:id/reviews', requireRole('commuter'), (req, res) => {
+  const lotId = Number(req.params.id);
+  const lot = db.prepare('SELECT id FROM lots WHERE id = ?').get(lotId);
+  if (!lot) return res.status(404).json({ error: 'Không tìm thấy bãi' });
+
+  const rating = Math.round(Number(req.body?.rating));
+  const comment = (req.body?.comment || '').toString().slice(0, 500);
+  if (!(rating >= 1 && rating <= 5))
+    return res.status(400).json({ error: 'Số sao phải từ 1 đến 5' });
+
+  const existing = db
+    .prepare('SELECT id FROM reviews WHERE lot_id = ? AND user_id = ?')
+    .get(lotId, req.user.id);
+  const now = Date.now();
+  if (existing) {
+    db.prepare('UPDATE reviews SET rating = ?, comment = ?, user_name = ?, updated_at = ? WHERE id = ?')
+      .run(rating, comment, req.user.name, now, existing.id);
+  } else {
+    db.prepare(
+      'INSERT INTO reviews (lot_id, user_id, user_name, rating, comment, updated_at) VALUES (?,?,?,?,?,?)'
+    ).run(lotId, req.user.id, req.user.name, rating, comment, now);
+  }
+  recomputeLotRating(lotId);
+
+  const updated = db.prepare('SELECT * FROM lots WHERE id = ?').get(lotId);
+  res.json({ lot: { ...serializeLot(updated), reviews: loadReviews(lotId) }, edited: !!existing });
 });
 
 export default router;
@@ -68,6 +110,7 @@ ownerRouter.patch('/lot/capacity', requireRole('owner'), (req, res) => {
   if (!Number.isFinite(val)) return res.status(400).json({ error: 'Giá trị không hợp lệ' });
   const clamped = Math.max(0, Math.min(lot.total_spots, Math.round(val)));
   db.prepare('UPDATE lots SET available_spots = ? WHERE id = ?').run(clamped, lot.id);
+  broadcastLot(lot.id); // đẩy real-time tới commuter
   res.json({ lot: serializeLot({ ...lot, available_spots: clamped }) });
 });
 

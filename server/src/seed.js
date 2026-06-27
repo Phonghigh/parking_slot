@@ -65,22 +65,31 @@ const lotRecords = lots.map((l, i) => {
   return { id, ownerId, ...l };
 });
 
-// ---- Reviews ----
+// ---- Reviews ---- (user_id = NULL: đánh giá mẫu, không gắn tài khoản)
 const insertReview = db.prepare(
-  'INSERT INTO reviews (lot_id, user_name, rating, comment) VALUES (?,?,?,?)'
+  'INSERT INTO reviews (lot_id, user_name, rating, comment, updated_at) VALUES (?,?,?,?,?)'
 );
 const sampleReviews = [
   ['Hoàng Nam', 5, 'Bãi rộng, có mái che, bảo vệ thân thiện.'],
   ['Minh Anh', 4, 'Giá ổn, gần trung tâm, dễ tìm chỗ.'],
   ['Quốc Bảo', 5, 'Thanh toán qua app rất tiện, không cần vé giấy.'],
   ['Thuỳ Linh', 4, 'Sạch sẽ, có chỗ sạc xe điện.'],
+  ['Đức Anh', 5, 'Nhân viên nhiệt tình, ra vào nhanh.'],
+  ['Phương Vy', 3, 'Giờ cao điểm hơi đông, cần chờ.'],
+  ['Tuấn Kiệt', 4, 'Có camera an ninh, yên tâm để xe.'],
+  ['Bảo Trân', 5, 'Quá tiện, không cần vé giấy nữa.'],
+  ['Gia Hân', 4, 'Vị trí dễ tìm, giá hợp lý.'],
 ];
 lotRecords.forEach((lot, i) => {
-  const n = (i % 3) + 1;
+  const n = 3 + (i % 4); // 3–6 đánh giá mỗi bãi
   for (let k = 0; k < n; k++) {
-    const r = sampleReviews[(i + k) % sampleReviews.length];
-    insertReview.run(lot.id, r[0], r[1], r[2]);
+    const r = sampleReviews[(i * 3 + k) % sampleReviews.length];
+    insertReview.run(lot.id, r[0], r[1], r[2], Date.now() - (k + 1) * 86400000);
   }
+  // rating + review_count khớp số đánh giá thực (nhất quán khi user thêm/sửa sau này)
+  const agg = db.prepare('SELECT COUNT(*) c, AVG(rating) a FROM reviews WHERE lot_id = ?').get(lot.id);
+  db.prepare('UPDATE lots SET rating = ?, review_count = ? WHERE id = ?')
+    .run(Math.round(agg.a * 10) / 10, agg.c, lot.id);
 });
 
 // ---- Seed phiên gửi xe cho bãi của owner1 (lot đầu tiên) để dashboard có số ----

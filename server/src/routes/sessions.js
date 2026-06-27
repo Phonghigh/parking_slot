@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { db } from '../db.js';
 import { requireAuth, requireRole } from '../auth.js';
 import { randomToken, computeFee, generateSlotLabel, shortCode } from '../lib.js';
+import { broadcastLot } from '../events.js';
 
 const router = Router();
 
@@ -71,6 +72,7 @@ router.post('/', requireRole('owner'), (req, res) => {
     )
     .run(lotId, userId, plateNorm, slotLabel, Date.now(), checkoutToken, code);
   db.prepare('UPDATE lots SET available_spots = available_spots - 1 WHERE id = ?').run(lotId);
+  broadcastLot(lotId); // real-time: chỗ trống -1
 
   const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(Number(info.lastInsertRowid));
   res.json({ session: enrich(session) });
@@ -172,6 +174,7 @@ router.post('/:id/checkout', requireRole('owner'), (req, res) => {
     "UPDATE sessions SET status = 'completed', checkout_at = ?, fee = ?, payment_method = ? WHERE id = ?"
   ).run(checkoutAt, fee, method, session.id);
   db.prepare('UPDATE lots SET available_spots = available_spots + 1 WHERE id = ?').run(lot.id);
+  broadcastLot(lot.id); // real-time: chỗ trống +1
 
   // Trừ ví nếu thanh toán bằng ParkSmart Wallet
   if (method === 'wallet') {

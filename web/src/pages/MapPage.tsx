@@ -5,6 +5,7 @@ import { MapView } from '../components/MapView';
 import { LotCard } from '../components/LotCard';
 import { capacityColor, effectivePrice, formatDistance, priceLabel } from '../lib/format';
 import { IconPin, IconStar, IconRoof } from '../components/icons';
+import { subscribeLotUpdates } from '../lib/liveEvents';
 
 const HCMC: [number, number] = [10.7769, 106.7009];
 
@@ -23,10 +24,39 @@ export function MapPage() {
   const [covered, setCovered] = useState(false);
   const [openNow, setOpenNow] = useState(false);
   const [minRating, setMinRating] = useState(0);
+  const [flashIds, setFlashIds] = useState<Set<number>>(new Set());
 
   const loadLots = (c: [number, number]) => {
     api.listLots(c[0], c[1]).then((r) => setLots(r.lots));
   };
+
+  // Real-time: nhận cập nhật capacity qua SSE và áp ngay vào map/list (không cần reload)
+  useEffect(() => {
+    const unsub = subscribeLotUpdates((u) => {
+      setLots((prev) =>
+        prev.map((l) =>
+          l.id === u.id
+            ? { ...l, available_spots: u.available_spots, total_spots: u.total_spots, is_open: u.is_open }
+            : l
+        )
+      );
+      setActiveLot((prev) =>
+        prev && prev.id === u.id
+          ? { ...prev, available_spots: u.available_spots, is_open: u.is_open }
+          : prev
+      );
+      // hiệu ứng nhấp nháy thẻ vừa đổi để thấy rõ "live"
+      setFlashIds((prev) => new Set(prev).add(u.id));
+      setTimeout(() => {
+        setFlashIds((prev) => {
+          const n = new Set(prev);
+          n.delete(u.id);
+          return n;
+        });
+      }, 1600);
+    });
+    return unsub;
+  }, []);
 
   useEffect(() => {
     loadLots(center);
@@ -162,7 +192,16 @@ export function MapPage() {
         <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/50" />
 
         <div className="px-4 pt-3">
-          <h2 className="font-bold text-slate-700">{visible.length} bãi đỗ gần đây</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="font-bold text-slate-700">{visible.length} bãi đỗ gần đây</h2>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
+              </span>
+              Cập nhật trực tiếp
+            </span>
+          </div>
 
           {/* Sort & filter pills */}
           <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto pb-1">
@@ -182,7 +221,14 @@ export function MapPage() {
 
         <div className="no-scrollbar mt-2 flex-1 space-y-2 overflow-y-auto px-4 pb-32">
           {visible.map((lot) => (
-            <LotCard key={lot.id} lot={lot} onClick={() => nav(`/lot/${lot.id}`)} />
+            <div
+              key={lot.id}
+              className={`rounded-2xl transition-all duration-500 ${
+                flashIds.has(lot.id) ? 'ring-2 ring-brand-400 ring-offset-2' : ''
+              }`}
+            >
+              <LotCard lot={lot} onClick={() => nav(`/lot/${lot.id}`)} />
+            </div>
           ))}
           {visible.length === 0 && (
             <p className="py-10 text-center text-sm text-slate-400">Không có bãi phù hợp bộ lọc.</p>

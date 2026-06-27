@@ -79,6 +79,8 @@ export function initSchema() {
 
   // Migration an toàn cho DB cũ (thêm cột nếu thiếu)
   addColumnIfMissing('sessions', 'short_code', 'TEXT');
+  addColumnIfMissing('reviews', 'user_id', 'INTEGER');
+  addColumnIfMissing('reviews', 'updated_at', 'INTEGER');
 }
 
 function addColumnIfMissing(table, col, def) {
