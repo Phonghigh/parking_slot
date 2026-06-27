@@ -1,0 +1,45 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(python3 *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json,sys,os; d=json.load(sys.stdin); p=d.get('tool_input',{}).get('file_path',''); pl=p.lower(); mp={'commuter':['commuter','search','check','vehicle','booking'],'parking-partner':['partner','onboard','capacity','schedul','lot'],'parking-staff':['staff','attendant'],'core':['session','qr','data-model','model','fallback'],'integrations':['payment','maps','metro','ticket','busmap'],'admin':['admin','dashboard','government']}; m=[f\\\"docs/knowledgebase/{mod}/\\\" for mod,kw in mp.items() if any(k in pl for k in kw)]; m=m if m else ['docs/knowledgebase/ (check all modules)']; print(json.dumps({'systemMessage':'KB update? '+os.path.basename(p)+' -> '+', '.join(m)}))\" 2>/dev/null || true",
+            "statusMessage": "Checking knowledgebase relevance..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"systemMessage\": \"ParkHub reminder: If any new product decisions were made this session (flows, features, scope, data model), update CLAUDE.md and the memory files at ~/.claude/projects/-home-fionn-Documents-Dev-parking-slot/memory/\"}'",
+            "statusMessage": "Checking ParkHub session notes..."
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json; f=open('/home/fionn/Documents/Dev/parking_slot/CLAUDE.md'); c=f.read(); f.close(); print(json.dumps({'hookSpecificOutput':{'hookEventName':'SessionStart','additionalContext':'[ParkHub Project Loaded]\\n'+c[:4000]}}))\" 2>/dev/null || true",
+            "statusMessage": "Loading ParkHub project context..."
+          }
+        ]
+      }
+    ]
+  }
+}
