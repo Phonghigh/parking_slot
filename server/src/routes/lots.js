@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { db } from '../db.js';
 import { haversineKm } from '../lib.js';
-import { requireRole, requireAuth } from '../auth.js';
+import { requireRole, requireAuth, getUserFromReq } from '../auth.js';
 import { broadcastLot } from '../events.js';
 
 const router = Router();
@@ -21,6 +21,13 @@ function loadReviews(lotId) {
       'SELECT id, user_id, user_name, rating, comment, updated_at FROM reviews WHERE lot_id = ? ORDER BY COALESCE(updated_at, 0) DESC, id DESC'
     )
     .all(lotId);
+}
+
+// Người dùng đã từng gửi xe tại bãi này chưa (để được quyền đánh giá)
+function hasSessionAtLot(userId, lotId) {
+  return !!db
+    .prepare('SELECT 1 FROM sessions WHERE user_id = ? AND lot_id = ? LIMIT 1')
+    .get(userId, lotId);
 }
 
 // Tính lại rating trung bình + số đánh giá của bãi sau khi review thay đổi
@@ -45,11 +52,13 @@ router.get('/', (req, res) => {
   res.json({ lots: withDistance });
 });
 
-// GET /api/lots/:id → chi tiết + reviews
+// GET /api/lots/:id → chi tiết + reviews (+ can_review nếu đã đăng nhập)
 router.get('/:id', (req, res) => {
   const lot = db.prepare('SELECT * FROM lots WHERE id = ?').get(req.params.id);
   if (!lot) return res.status(404).json({ error: 'Không tìm thấy bãi' });
-  res.json({ lot: { ...serializeLot(lot), reviews: loadReviews(lot.id) } });
+  const user = getUserFromReq(req); // tuỳ chọn — không bắt buộc đăng nhập
+  const canReview = !!(user && user.role === 'commuter' && hasSessionAtLot(user.id, lot.id));
+  res.json({ lot: { ...serializeLot(lot), reviews: loadReviews(lot.id), can_review: canReview } });
 });
 
 // POST /api/lots/:id/reviews → tạo HOẶC sửa đánh giá (mỗi commuter 1 đánh giá / bãi)
@@ -57,6 +66,12 @@ router.post('/:id/reviews', requireRole('commuter'), (req, res) => {
   const lotId = Number(req.params.id);
   const lot = db.prepare('SELECT id FROM lots WHERE id = ?').get(lotId);
   if (!lot) return res.status(404).json({ error: 'Không tìm thấy bãi' });
+
+  // Chỉ cho đánh giá khi đã từng gửi xe tại bãi này (chống đánh giá ảo)
+  if (!hasSessionAtLot(req.user.id, lotId))
+    return res
+      .status(403)
+      .json({ error: 'Bạn cần gửi xe tại bãi này ít nhất 1 lần trước khi đánh giá' });
 
   const rating = Math.round(Number(req.body?.rating));
   const comment = (req.body?.comment || '').toString().slice(0, 500);

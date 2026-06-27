@@ -126,12 +126,19 @@ export function LotDetail() {
         <section className="mt-6">
           <h2 className="font-bold text-slate-800">Đánh giá từ người dùng</h2>
 
-          {/* Form viết / sửa đánh giá của chính mình */}
-          <ReviewForm
-            lotId={lot.id}
-            existing={lot.reviews?.find((r) => r.user_id === user?.id) ?? null}
-            onSaved={(updated) => setLot((prev) => (prev ? { ...prev, ...updated } : updated))}
-          />
+          {/* Form đánh giá — chỉ khi đã từng gửi xe tại bãi này */}
+          {lot.can_review ? (
+            <ReviewForm
+              lotId={lot.id}
+              existing={lot.reviews?.find((r) => r.user_id === user?.id) ?? null}
+              onSaved={(updated) => setLot((prev) => (prev ? { ...prev, ...updated } : updated))}
+            />
+          ) : (
+            <div className="glass-surface mt-3 flex items-center gap-2 rounded-3xl px-4 py-3 text-sm text-slate-500">
+              <IconStar width={16} className="shrink-0 text-slate-300" />
+              Gửi xe tại bãi này một lần để có thể đánh giá trải nghiệm.
+            </div>
+          )}
 
           <div className="mt-3 space-y-3">
             {(lot.reviews ?? [])

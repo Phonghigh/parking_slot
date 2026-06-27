@@ -63,6 +63,7 @@ export interface Lot {
   is_open: boolean;
   distance?: number | null;
   reviews?: Review[];
+  can_review?: boolean;
 }
 
 export interface Session {

@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import { QrDisplay } from '../components/QrDisplay';
 import { PaymentSelector } from '../components/PaymentSelector';
 import { formatVnd, formatClock, formatDuration } from '../lib/format';
-import { IconBell, IconCheck, IconTicket } from '../components/icons';
+import { IconBell, IconCheck, IconTicket, IconStar } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
 const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'ParkSmart Wallet', cash: 'tiền mặt' };
@@ -262,6 +262,9 @@ function SuccessView({
           </div>
         </div>
 
+        {/* Mời đánh giá trải nghiệm ngay sau khi gửi xe xong */}
+        <CheckoutReviewPrompt session={session} />
+
         {remaining > 0 ? (
           <button onClick={onBack} className="btn-primary mt-5 w-full">
             Xem {remaining} xe đang gửi
@@ -271,6 +274,64 @@ function SuccessView({
         )}
         <button onClick={onHistory} className="btn-outline mt-2 w-full">Xem lịch sử</button>
       </div>
+    </div>
+  );
+}
+
+/** Lời mời đánh giá trải nghiệm ở màn checkout thành công. */
+function CheckoutReviewPrompt({ session }: { session: Session }) {
+  const [rating, setRating] = useState(5);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const submit = async () => {
+    setBusy(true);
+    try {
+      await api.submitReview(session.lot_id, rating, comment);
+      setDone(true);
+    } catch {
+      setDone(true); // dù lỗi cũng đóng prompt, không chặn luồng checkout
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done)
+    return (
+      <div className="glass-green mt-5 rounded-2xl px-4 py-3 text-sm font-medium text-brand-700">
+        ✓ Cảm ơn đánh giá của bạn!
+      </div>
+    );
+
+  return (
+    <div className="glass-surface mt-5 rounded-3xl p-4 text-left">
+      <p className="text-center text-sm font-semibold text-slate-700">Đánh giá trải nghiệm gửi xe?</p>
+      <div className="mt-2 flex items-center justify-center gap-1" onMouseLeave={() => setHover(0)}>
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onClick={() => setRating(n)}
+            onMouseEnter={() => setHover(n)}
+            className="p-0.5 transition active:scale-90"
+            aria-label={`${n} sao`}
+          >
+            <IconStar width={28} className={(hover || rating) >= n ? 'text-amber-400' : 'text-slate-300'} />
+          </button>
+        ))}
+      </div>
+      <textarea
+        className="input mt-3 min-h-[52px] resize-none bg-white/70"
+        placeholder="Nhận xét (tuỳ chọn)…"
+        maxLength={500}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+      <button onClick={submit} disabled={busy} className="btn-primary mt-3 w-full">
+        {busy ? 'Đang gửi…' : 'Gửi đánh giá'}
+      </button>
     </div>
   );
 }
