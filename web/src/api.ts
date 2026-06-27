@@ -86,6 +86,28 @@ export interface Session {
   };
 }
 
+export interface ActivityEvent {
+  type: 'checkin' | 'checkout';
+  plate: string;
+  slot: string | null;
+  ts: number;
+  status?: string;
+  fee?: number | null;
+}
+
+export interface OwnerStats {
+  available: number;
+  total: number;
+  occupancyPct: number;
+  currentVehicles: number;
+  todayEarnings: number;
+  earningsDeltaPct: number | null;
+  checkinsToday: number;
+  avgStayHours: number;
+  hourly: { label: string; count: number }[];
+  recent: ActivityEvent[];
+}
+
 export const api = {
   // auth
   login: (username: string, password: string) =>
@@ -107,6 +129,13 @@ export const api = {
   },
   getLot: (id: number) => request<{ lot: Lot }>(`/lots/${id}`),
   ownerLots: () => request<{ lots: Lot[] }>('/owner/lots'),
+  ownerLot: () => request<{ lot: Lot }>('/owner/lot'),
+  ownerStats: () => request<{ lot: Lot; stats: OwnerStats }>('/owner/stats'),
+  ownerSetCapacity: (available_spots: number) =>
+    request<{ lot: Lot }>('/owner/lot/capacity', {
+      method: 'PATCH',
+      body: JSON.stringify({ available_spots }),
+    }),
 
   // sessions
   checkin: (lotId: number, userId: number, plate: string) =>

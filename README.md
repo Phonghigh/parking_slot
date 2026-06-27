@@ -46,7 +46,9 @@ cd server && npm install && npm run seed && npm run dev   # http://localhost:400
 cd web && npm install && npm run dev                      # http://localhost:5173
 ```
 
-Demo accounts (password `123456`): `commuter1` (người gửi xe), `owner1` / `owner2` (chủ bãi).
+Demo accounts (password `123456`): `commuter1` (người gửi xe). Mỗi owner gắn **đúng 1 bãi** —
+`owner1` quản lý "Bãi Đỗ Xe Vincom Center" (có sẵn dữ liệu cho dashboard analytics); `owner2`…`owner12`
+cho các bãi còn lại.
 Full demo walkthrough + notes: see [`web`](web/) and the plan at
 [`.claude/plans/t-i-c-n-build-1-breezy-graham.md`](.claude/plans/t-i-c-n-build-1-breezy-graham.md).
 

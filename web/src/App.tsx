@@ -12,6 +12,8 @@ import { TicketPage } from './pages/TicketPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { AccountPage } from './pages/AccountPage';
 import { OwnerDashboard } from './pages/OwnerDashboard';
+import { OwnerOperations } from './pages/OwnerOperations';
+import { OwnerProfile } from './pages/OwnerProfile';
 
 export function App() {
   return (
@@ -54,6 +56,8 @@ export function App() {
         }
       >
         <Route path="/owner" element={<OwnerDashboard />} />
+        <Route path="/owner/operations" element={<OwnerOperations />} />
+        <Route path="/owner/profile" element={<OwnerProfile />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
