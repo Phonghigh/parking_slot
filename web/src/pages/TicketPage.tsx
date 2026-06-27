@@ -119,13 +119,13 @@ export function TicketPage() {
 
 function EmptyTicket({ onFind }: { onFind: () => void }) {
   return (
-    <div className="flex h-full flex-col items-center justify-center px-8 text-center">
-      <div className="grid h-20 w-20 place-items-center rounded-full bg-slate-200 text-slate-400">
+    <div className="flex h-full flex-col items-center justify-center px-8 text-center animate-fade-in">
+      <div className="glass-icon grid h-20 w-20 place-items-center rounded-full text-slate-400">
         <IconTicket width={36} />
       </div>
-      <h2 className="mt-4 text-lg font-bold text-slate-700">Chưa có phiên gửi xe</h2>
-      <p className="mt-1 text-sm text-slate-400">Tìm một bãi đỗ và bấm “Gửi xe ngay” để bắt đầu.</p>
-      <button onClick={onFind} className="btn-primary mt-5">Tìm bãi đỗ</button>
+      <h2 className="mt-5 text-lg font-bold text-slate-700">Chưa có phiên gửi xe</h2>
+      <p className="mt-1 text-sm text-slate-500">Tìm một bãi đỗ và bấm "Gửi xe ngay" để bắt đầu.</p>
+      <button onClick={onFind} className="btn-primary mt-6">Tìm bãi đỗ</button>
     </div>
   );
 }
@@ -154,26 +154,29 @@ function ActiveTicket({
     <div className="space-y-4">
       {/* Ticket card */}
       <div className="card overflow-hidden">
-        <div className="flex items-start justify-between gap-3 p-4">
+        <div className="flex items-start justify-between gap-3 p-5">
           <div className="flex-1">
-            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700">
+            <span className="glass-green inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-brand-700">
               ⚡ Đang hoạt động
             </span>
-            <h2 className="mt-2 font-bold text-slate-800">{session.lot.name}</h2>
-            <p className="text-sm text-slate-400">{session.slot_label}</p>
+            <h2 className="mt-2.5 font-bold text-slate-800">{session.lot.name}</h2>
+            <p className="text-sm text-slate-500">{session.slot_label}</p>
           </div>
           <div className="text-right">
             <p className="text-[10px] uppercase tracking-wide text-slate-400">Biển số xe</p>
-            <span className="plate mt-1 text-lg">{session.plate}</span>
+            <span className="plate mt-1 text-base">{session.plate}</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 border-t border-slate-100 px-4 py-3">
-          <Field label="Thời gian vào" value={`${formatClock(session.checkin_at)}, Hôm nay`} />
-          <Field label="Thời gian đỗ" value={<span className="font-mono text-brand-600">{formatDuration(now - session.checkin_at)}</span>} />
+        <div className="grid grid-cols-2 gap-3 border-t border-white/40 px-5 py-3">
+          <Field label="Thời gian vào" value={`${formatClock(session.checkin_at)}`} />
+          <Field
+            label="Thời gian đỗ"
+            value={<span className="font-mono text-blue-600">{formatDuration(now - session.checkin_at)}</span>}
+          />
         </div>
 
-        <div className="m-4 mt-0 flex items-center justify-between rounded-xl bg-brand-50 px-4 py-3">
+        <div className="glass-green m-4 mt-0 flex items-center justify-between rounded-2xl px-4 py-3">
           <span className="text-sm text-slate-600">Tạm tính</span>
           <span className="text-lg font-extrabold text-brand-700">{formatVnd(session.estimate_fee)}</span>
         </div>
@@ -236,23 +239,23 @@ function SuccessView({
   const pm = session.payment_method || 'cash';
 
   return (
-    <div className="flex min-h-full items-center justify-center p-5">
+    <div className="flex min-h-full items-center justify-center p-5 animate-fade-in">
       <div className="card w-full max-w-sm p-6 text-center">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand-100 text-brand-600">
+        <div className="glass-icon-green mx-auto grid h-16 w-16 place-items-center rounded-full text-brand-600">
           <IconCheck width={34} />
         </div>
-        <h1 className="mt-4 text-xl font-extrabold text-slate-900">Thanh toán thành công!</h1>
-        <p className="mt-1 text-sm text-slate-400">Cảm ơn bạn đã sử dụng dịch vụ của ParkSmart.</p>
+        <h1 className="mt-4 text-xl font-extrabold text-slate-800">Thanh toán thành công!</h1>
+        <p className="mt-1 text-sm text-slate-500">Cảm ơn bạn đã sử dụng dịch vụ của ParkSmart.</p>
 
-        <div className="mt-5 space-y-3 rounded-2xl bg-slate-50 p-4 text-left">
+        <div className="glass-surface mt-5 space-y-3 rounded-3xl p-4 text-left">
           <Row label="Vị trí đỗ xe" value={session.lot.name} strong />
           <Row label="Thời gian gửi" value={`${formatClock(inT)} - ${formatClock(outT)} (${dur})`} />
-          <div className="border-t border-dashed border-slate-200 pt-3">
+          <div className="border-t border-dashed border-white/50 pt-3">
             <p className="text-xs uppercase tracking-wide text-slate-400">Tổng tiền phí</p>
             <div className="mt-1 flex items-center gap-2">
               <span className="text-2xl font-extrabold text-brand-700">{formatVnd(session.fee)}</span>
-              <span className="rounded-md bg-brand-50 px-2 py-1 text-xs font-medium text-brand-600">
-                Đã thanh toán qua {PM_LABEL[pm]}
+              <span className="glass-green rounded-full px-2.5 py-1 text-xs font-semibold text-brand-700">
+                {PM_LABEL[pm]}
               </span>
             </div>
           </div>
