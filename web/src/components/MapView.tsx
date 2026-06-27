@@ -83,11 +83,42 @@ function MapClickWatcher({ onClick }: { onClick: () => void }) {
   return null;
 }
 
+function searchPinIcon(name: string) {
+  const label = name.split(',')[0].trim();
+  return L.divIcon({
+    className: '',
+    html: `
+      <div style="transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;">
+        <div style="
+          background:#fff;
+          border:1.5px solid rgba(0,0,0,0.12);
+          border-radius:8px;
+          padding:4px 8px;
+          font-size:11px;
+          font-weight:600;
+          color:#1e293b;
+          white-space:nowrap;
+          max-width:180px;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          box-shadow:0 2px 8px rgba(0,0,0,0.18);
+          margin-bottom:4px;
+        ">${label}</div>
+        <svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 0C7.163 0 0 7.163 0 16c0 10.627 14.222 23.166 15.208 24.041a1 1 0 0 0 1.584 0C17.778 39.166 32 26.627 32 16 32 7.163 24.837 0 16 0z" fill="#EA4335"/>
+          <circle cx="16" cy="16" r="7" fill="white"/>
+        </svg>
+      </div>`,
+    iconSize: [0, 0],
+  });
+}
+
 export function MapView({
   center,
   userPos,
   lots,
   activeId,
+  searchPin,
   onSelect,
   onMoveEnd,
   onMapClick,
@@ -96,6 +127,7 @@ export function MapView({
   userPos: [number, number] | null;
   lots: Lot[];
   activeId?: number;
+  searchPin?: { coords: [number, number]; name: string } | null;
   onSelect: (lot: Lot) => void;
   onMoveEnd?: (c: [number, number]) => void;
   onMapClick?: () => void;
@@ -110,6 +142,9 @@ export function MapView({
       <DragWatcher onMoveEnd={onMoveEnd} />
       {onMapClick && <MapClickWatcher onClick={onMapClick} />}
       {userPos && <Marker position={userPos} icon={userIcon()} />}
+      {searchPin && (
+        <Marker position={searchPin.coords} icon={searchPinIcon(searchPin.name)} />
+      )}
       <MarkerClusterGroup chunkedLoading>
         {lots.map((lot) => (
           <Marker

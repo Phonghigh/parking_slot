@@ -18,6 +18,7 @@ export function MapPage() {
   const [activeLot, setActiveLot] = useState<Lot | undefined>();
   const [query, setQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [searchPin, setSearchPin] = useState<{ coords: [number, number]; name: string } | null>(null);
   const [sort, setSort] = useState<SortKey>('distance');
   const [covered, setCovered] = useState(false);
   const [openNow, setOpenNow] = useState(false);
@@ -50,6 +51,7 @@ export function MapPage() {
       const c: [number, number] = [pos.coords.latitude, pos.coords.longitude];
       setUserPos(c);
       setCenter(c);
+      setSearchPin(null);
       loadLots(c);
     });
   };
@@ -66,6 +68,7 @@ export function MapPage() {
       if (data[0]) {
         const c: [number, number] = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
         setCenter(c);
+        setSearchPin({ coords: c, name: data[0].display_name ?? query });
         loadLots(c);
       }
     } finally {
@@ -97,12 +100,13 @@ export function MapPage() {
           userPos={userPos}
           lots={visible}
           activeId={activeLot?.id}
+          searchPin={searchPin}
           onSelect={(l) => {
             setActiveLot(l);
             setCenter([l.lat, l.lng]);
           }}
           onMoveEnd={(c) => loadLots(c)}
-          onMapClick={() => setActiveLot(undefined)}
+          onMapClick={() => { setActiveLot(undefined); setSearchPin(null); }}
         />
 
         {/* Glass search bar */}
@@ -117,6 +121,18 @@ export function MapPage() {
                 onChange={(e) => setQuery(e.target.value)}
               />
               {searching && <span className="text-xs text-slate-400">…</span>}
+              {query && !searching && (
+                <button
+                  type="button"
+                  onClick={() => { setQuery(''); setSearchPin(null); }}
+                  className="shrink-0 text-slate-400 transition hover:text-slate-600 active:scale-90"
+                  aria-label="Xóa tìm kiếm"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              )}
             </div>
             <button
               type="button"
