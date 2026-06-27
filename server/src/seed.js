@@ -56,6 +56,100 @@ const lots = [
   { name: 'Bãi Xe Diamond Plaza', lat: 10.7805, lng: 106.6985, address: '34 Lê Duẩn, Bến Nghé, Quận 1', image_url: IMG2, pricing_type: 'hourly', price_per_hour: 7000, flat_price: 0, total_spots: 55, available_spots: 30, covered: 1, rating: 4.5, review_count: 176, amenities: [AM.cam, AM.mai, AM.app, AM.sac].join('|'), open_hours: '08:00 - 22:00', is_open: 1 },
 ];
 
+// ===== Sinh thêm bãi đỗ phủ khắp TP.HCM (đậm đặc quanh Metro Line 1) tới 150 bãi =====
+// 14 ga Metro Line 1 (Bến Thành – Suối Tiên)
+const METRO = [
+  { n: 'Bến Thành', lat: 10.7722, lng: 106.6979 },
+  { n: 'Nhà hát Thành phố', lat: 10.7765, lng: 106.7030 },
+  { n: 'Ba Son', lat: 10.7855, lng: 106.7065 },
+  { n: 'Công viên Văn Thánh', lat: 10.7975, lng: 106.7155 },
+  { n: 'Tân Cảng', lat: 10.7980, lng: 106.7220 },
+  { n: 'Thảo Điền', lat: 10.8030, lng: 106.7335 },
+  { n: 'An Phú', lat: 10.8040, lng: 106.7430 },
+  { n: 'Rạch Chiếc', lat: 10.8175, lng: 106.7560 },
+  { n: 'Phước Long', lat: 10.8290, lng: 106.7640 },
+  { n: 'Bình Thái', lat: 10.8410, lng: 106.7720 },
+  { n: 'Thủ Đức', lat: 10.8490, lng: 106.7790 },
+  { n: 'Khu Công nghệ cao', lat: 10.8580, lng: 106.7880 },
+  { n: 'Đại học Quốc gia', lat: 10.8720, lng: 106.7980 },
+  { n: 'Bến xe Suối Tiên', lat: 10.8790, lng: 106.8140 },
+];
+
+// Các quận/khu vực + tên đường thật để rải đều
+const AREAS = [
+  { d: 'Quận 1', lat: 10.7740, lng: 106.6990, streets: ['Lê Lợi', 'Hàm Nghi', 'Lê Thánh Tôn', 'Pasteur', 'Nam Kỳ Khởi Nghĩa', 'Lý Tự Trọng', 'Calmette', 'Cô Giang', 'Tôn Đức Thắng'] },
+  { d: 'Quận 3', lat: 10.7820, lng: 106.6850, streets: ['Võ Văn Tần', 'Nguyễn Đình Chiểu', 'Cách Mạng Tháng 8', 'Lê Văn Sỹ', 'Trần Quốc Thảo', 'Bà Huyện Thanh Quan', 'Nguyễn Thị Minh Khai'] },
+  { d: 'Quận 4', lat: 10.7570, lng: 106.7050, streets: ['Khánh Hội', 'Hoàng Diệu', 'Nguyễn Tất Thành', 'Đoàn Văn Bơ', 'Tôn Đản', 'Bến Vân Đồn'] },
+  { d: 'Quận 5', lat: 10.7540, lng: 106.6630, streets: ['Trần Hưng Đạo', 'Nguyễn Trãi', 'An Dương Vương', 'Châu Văn Liêm', 'Hải Thượng Lãn Ông', 'Sư Vạn Hạnh'] },
+  { d: 'Quận 6', lat: 10.7460, lng: 106.6350, streets: ['Kinh Dương Vương', 'Hậu Giang', 'Hồng Bàng', 'Bà Hom', 'Phạm Văn Chí'] },
+  { d: 'Quận 7', lat: 10.7340, lng: 106.7220, streets: ['Nguyễn Văn Linh', 'Nguyễn Thị Thập', 'Tôn Dật Tiên', 'Huỳnh Tấn Phát', 'Lê Văn Lương', 'Phú Mỹ Hưng'] },
+  { d: 'Quận 8', lat: 10.7240, lng: 106.6280, streets: ['Phạm Thế Hiển', 'Tạ Quang Bửu', 'Dương Bá Trạc', 'Âu Dương Lân'] },
+  { d: 'Quận 10', lat: 10.7730, lng: 106.6670, streets: ['3 Tháng 2', 'Sư Vạn Hạnh', 'Lý Thường Kiệt', 'Cao Thắng', 'Hòa Hảo', 'Thành Thái', 'Tô Hiến Thành'] },
+  { d: 'Quận 11', lat: 10.7640, lng: 106.6430, streets: ['Lạc Long Quân', '3 Tháng 2', 'Lãnh Binh Thăng', 'Hòa Bình', 'Minh Phụng'] },
+  { d: 'Quận 12', lat: 10.8670, lng: 106.6540, streets: ['Quang Trung', 'Nguyễn Ảnh Thủ', 'Tô Ký', 'Hà Huy Giáp', 'Lê Văn Khương'] },
+  { d: 'Bình Thạnh', lat: 10.8100, lng: 106.7090, streets: ['Bạch Đằng', 'Phan Đăng Lưu', 'Đinh Bộ Lĩnh', 'Nguyễn Xí', 'Xô Viết Nghệ Tĩnh', 'Nơ Trang Long'] },
+  { d: 'Phú Nhuận', lat: 10.7990, lng: 106.6800, streets: ['Phan Xích Long', 'Hoàng Văn Thụ', 'Nguyễn Văn Trỗi', 'Huỳnh Văn Bánh', 'Đặng Văn Ngữ'] },
+  { d: 'Tân Bình', lat: 10.8010, lng: 106.6520, streets: ['Cộng Hòa', 'Trường Chinh', 'Hoàng Văn Thụ', 'Lý Thường Kiệt', 'Âu Cơ', 'Trường Sơn'] },
+  { d: 'Tân Phú', lat: 10.7900, lng: 106.6280, streets: ['Lũy Bán Bích', 'Tân Kỳ Tân Quý', 'Gò Dầu', 'Hòa Bình', 'Âu Cơ'] },
+  { d: 'Gò Vấp', lat: 10.8380, lng: 106.6650, streets: ['Quang Trung', 'Nguyễn Oanh', 'Phan Văn Trị', 'Lê Đức Thọ', 'Nguyễn Văn Nghi', 'Phạm Văn Đồng'] },
+  { d: 'Bình Tân', lat: 10.7650, lng: 106.6020, streets: ['Kinh Dương Vương', 'Tên Lửa', 'Vành Đai Trong', 'Tỉnh Lộ 10', 'Lê Văn Quới'] },
+  { d: 'TP Thủ Đức', lat: 10.8300, lng: 106.7600, streets: ['Võ Văn Ngân', 'Kha Vạn Cân', 'Đặng Văn Bi', 'Đỗ Xuân Hợp', 'Lê Văn Việt', 'Man Thiện', 'Tô Ngọc Vân'] },
+  { d: 'Nhà Bè', lat: 10.6950, lng: 106.7330, streets: ['Nguyễn Hữu Thọ', 'Lê Văn Lương', 'Huỳnh Tấn Phát', 'Phạm Hữu Lầu'] },
+];
+
+const PREFIX = ['Bãi xe', 'Bãi giữ xe', 'Nhà xe', 'Bãi đỗ xe', 'Điểm giữ xe', 'Bãi xe máy'];
+const HOURS = ['24/7', '06:00 - 22:00', '05:00 - 23:00', '07:00 - 21:00', '06:00 - 24:00', '05:30 - 22:30'];
+const AMEN_POOL = [AM.cam, AM.mai, AM.app, AM.sac, AM.bv, AM.rua];
+const FLAT_PRICES = [3000, 4000, 5000, 6000, 7000, 10000];
+const HOURLY_PRICES = [3000, 4000, 5000, 6000, 8000];
+const SPOT_SIZES = [20, 30, 40, 50, 60, 80, 100, 120, 150, 200];
+
+const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const jit = (v) => v + (Math.random() - 0.5) * 0.009; // ~±500m
+const houseNo = () => Math.floor(Math.random() * 400) + 1;
+const usedNames = new Set(lots.map((l) => l.name));
+
+function genLot(name, lat, lng, address) {
+  if (usedNames.has(name)) name = `${name} ${Math.floor(Math.random() * 90) + 10}`;
+  usedNames.add(name);
+  const flat = Math.random() < 0.6;
+  const total = rnd(SPOT_SIZES);
+  const amenN = 1 + Math.floor(Math.random() * 4);
+  const amenities = [...AMEN_POOL].sort(() => Math.random() - 0.5).slice(0, amenN).join('|');
+  return {
+    name,
+    lat: +lat.toFixed(6),
+    lng: +lng.toFixed(6),
+    address,
+    image_url: Math.random() < 0.5 ? IMG : IMG2,
+    pricing_type: flat ? 'flat' : 'hourly',
+    price_per_hour: flat ? 0 : rnd(HOURLY_PRICES),
+    flat_price: flat ? rnd(FLAT_PRICES) : 0,
+    total_spots: total,
+    available_spots: Math.floor(Math.random() * (total + 1)),
+    covered: Math.random() < 0.5 ? 1 : 0,
+    rating: 0,
+    review_count: 0,
+    amenities,
+    open_hours: rnd(HOURS),
+    is_open: Math.random() < 0.92 ? 1 : 0,
+  };
+}
+
+const TARGET_LOTS = 150;
+while (lots.length < TARGET_LOTS) {
+  if (Math.random() < 0.45) {
+    // quanh ga Metro
+    const s = rnd(METRO);
+    lots.push(genLot(`${rnd(PREFIX)} Ga Metro ${s.n}`, jit(s.lat), jit(s.lng), `Gần Ga Metro ${s.n}, TP.HCM`));
+  } else {
+    // rải các quận
+    const a = rnd(AREAS);
+    const st = rnd(a.streets);
+    lots.push(genLot(`${rnd(PREFIX)} ${st}`, jit(a.lat), jit(a.lng), `${houseNo()} ${st}, ${a.d}, TP.HCM`));
+  }
+}
+
 // Mỗi bãi gắn 1 owner riêng: owner1 -> bãi 1 (Vincom), owner2 -> bãi 2, ...
 const lotRecords = lots.map((l, i) => {
   const ownerId = Number(
