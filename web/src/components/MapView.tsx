@@ -5,47 +5,71 @@ import 'react-leaflet-cluster/lib/assets/MarkerCluster.css';
 import 'react-leaflet-cluster/lib/assets/MarkerCluster.Default.css';
 import L from 'leaflet';
 import { Lot } from '../api';
-import { capacityColor, priceLabel } from '../lib/format';
+import { capacityColor } from '../lib/format';
+
+function shortPrice(lot: Lot): string {
+  const p = lot.pricing_type === 'flat' ? lot.flat_price : lot.price_per_hour;
+  return p >= 1000 ? `${Math.round(p / 1000)}k` : `${p}đ`;
+}
+
+function hexToRgb(hex: string) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `${r},${g},${b}`;
+}
 
 function lotIcon(lot: Lot, active: boolean) {
   const cap = capacityColor(lot.available_spots, lot.total_spots);
-  const scale = active ? 'scale(1.12)' : 'scale(1)';
-  const ring = active ? `0 0 0 2.5px #fff, 0 0 0 4px ${cap.color}` : 'none';
-  const shadow = `0 4px 16px ${cap.color}66, 0 1px 4px rgba(0,0,0,0.20)`;
+  const gradients: Record<string, string> = {
+    high:   'linear-gradient(135deg,#4ade80,#16a34a)',
+    medium: 'linear-gradient(135deg,#fb923c,#ea580c)',
+    low:    'linear-gradient(135deg,#f87171,#dc2626)',
+  };
+  const grad  = gradients[cap.key] ?? gradients.low;
+  const color = cap.key === 'medium' ? '#ea580c' : cap.color;
+
+  const circleSize = active ? 28 : 24;
+  const fontSize   = lot.available_spots >= 100 ? 9 : lot.available_spots >= 10 ? 11 : 14;
+  const pillPad    = active ? '6px 11px 6px 6px' : '5px 9px 5px 5px';
+  const shadow     = active
+    ? `0 6px 20px rgba(${hexToRgb(color)},0.38),0 2px 6px rgba(0,0,0,0.10),inset 0 1px 0 rgba(255,255,255,1)`
+    : '0 4px 14px rgba(0,0,0,0.13),0 1px 3px rgba(0,0,0,0.06),inset 0 1px 0 rgba(255,255,255,1)';
+  const border = active
+    ? '1.5px solid rgba(26,58,107,0.30)'
+    : '1.5px solid rgba(0,0,0,0.07)';
 
   return L.divIcon({
     className: '',
     html: `
-      <div style="transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center;">
-        <div class="${active ? 'marker-float' : ''}" style="display:flex; flex-direction:column; align-items:center;">
+      <div style="transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;">
+        <div style="
+          display:flex;align-items:center;gap:6px;
+          padding:${pillPad};
+          border-radius:20px;
+          background:rgba(255,255,255,0.97);
+          border:${border};
+          box-shadow:${shadow};
+          font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;
+          white-space:nowrap;
+        ">
           <div style="
-            background: linear-gradient(170deg, rgba(255,255,255,0.28) 0%, rgba(0,0,0,0.10) 100%), ${cap.color};
-            border: 1.5px solid rgba(255,255,255,0.50);
-            border-radius: 999px;
-            padding: 5px 12px;
-            font-weight: 700;
-            font-size: 12px;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.30);
-            white-space: nowrap;
-            transform: ${scale};
-            box-shadow:
-              inset 0 1.5px 0 rgba(255,255,255,0.65),
-              inset 0 -1px 0 rgba(0,0,0,0.12),
-              ${ring !== 'none' ? ring + ',' : ''}
-              ${shadow};
-          ">
-            ${priceLabel(lot)} · ${lot.available_spots} chỗ
-          </div>
-          <div style="
-            width:0; height:0;
-            border-left:5px solid transparent;
-            border-right:5px solid transparent;
-            border-top:7px solid ${cap.color};
-            margin-top:-1px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22));
-          "></div>
+            width:${circleSize}px;height:${circleSize}px;border-radius:50%;
+            background:${grad};
+            display:flex;align-items:center;justify-content:center;
+            font-size:${fontSize}px;font-weight:800;color:#fff;
+            box-shadow:0 2px 6px rgba(0,0,0,0.18);
+            flex-shrink:0;
+          ">${lot.available_spots}</div>
+          <span style="font-size:11px;font-weight:700;color:#1e293b;letter-spacing:-0.2px;">${shortPrice(lot)}</span>
         </div>
+        <div style="
+          width:10px;height:6px;
+          background:rgba(255,255,255,0.97);
+          clip-path:polygon(0 0,100% 0,50% 100%);
+          margin-top:-1px;
+          filter:drop-shadow(0 2px 2px rgba(0,0,0,0.08));
+        "></div>
       </div>`,
     iconSize: [0, 0],
   });
@@ -135,8 +159,10 @@ export function MapView({
   return (
     <MapContainer center={center} zoom={14} zoomControl={false} attributionControl={false} className="h-full w-full">
       <TileLayer
-        attribution='&copy; OpenStreetMap'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+        subdomains="abcd"
+        maxZoom={20}
       />
       <Recenter center={center} />
       <DragWatcher onMoveEnd={onMoveEnd} />

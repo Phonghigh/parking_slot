@@ -201,12 +201,12 @@
 
   /* ── Liquid Glass active filter pill ─────────────────────────── */
   .pill-active {
-    background: linear-gradient(170deg, rgba(255,255,255,0.70) 0%, rgba(0,177,79,0.28) 100%);
-    border: 1px solid rgba(0, 177, 79, 0.35);
+    background: linear-gradient(170deg, #2d3748 0%, #1a202c 100%);
+    border: 1px solid rgba(0, 0, 0, 0.18);
     box-shadow:
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-      inset 0 -1px 0 rgba(0, 177, 79, 0.15);
-    color: #007A35;
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.18);
+    color: #ffffff;
     outline: none;
   }
 
@@ -333,6 +333,27 @@
       left 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
       width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  /* Tab blob — dark charcoal pill (for in-page segmented controls) */
+  .blob-tab {
+    position: absolute;
+    top: 50%;
+    height: 36px;
+    translate: 0 -50%;
+    border-radius: 9999px;
+    background: linear-gradient(170deg, #2d3748 0%, #1a202c 100%);
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.12),
+      0 2px 10px rgba(0, 0, 0, 0.22);
+    pointer-events: none;
+    transition: left 0.15s ease-out, width 0.15s ease-out;
+  }
+  .blob-tab.landing {
+    transition:
+      left 0.38s cubic-bezier(0.34, 1.56, 0.64, 1),
+      width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
 }
 
 /* ── Leaflet map ──────────────────────────────────────────────── */
@@ -362,6 +383,22 @@
 }
 .marker-float {
   animation: marker-float 2.2s ease-in-out infinite;
+}
+
+/* ── Liquid button gradient flow ──────────────────────────────── */
+@keyframes liquid-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.liquid-btn {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb, #1d4ed8, #3b82f6, #60a5fa);
+  background-size: 300% 300%;
+  animation: liquid-flow 3s ease infinite;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.38);
+}
+.liquid-btn:active {
+  transform: scale(0.98);
 }
 
 /* ── Scrollbar ────────────────────────────────────────────────── */

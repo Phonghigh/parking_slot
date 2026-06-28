@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { api, Lot, Session } from '../api';
+import { api, Booking, Lot, Session } from '../api';
 import { QrScanner } from '../components/QrScanner';
-import { formatVnd, formatClock } from '../lib/format';
+import { formatVnd, formatClock, formatDateTime } from '../lib/format';
 import { readPlateFromImage } from '../lib/ocr';
-import { IconCamera, IconCheck, IconQr } from '../components/icons';
+import { IconCamera, IconCalendar, IconCheck, IconQr } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
 type Tab = 'checkin' | 'checkout';
@@ -64,11 +64,20 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
 }
 
 /* ---------------- Check-in ---------------- */
+const CHECKIN_HINT =
+  'Khách mở app GoPark: tab Tài khoản -> Mã QR Check-in (xe vào thường) hoặc tab Vé -> QR Đặt chỗ (đặt trước). Không quét được? Nhập mã bên dưới.';
+
 function parseUserId(text: string): number | null {
   // Cắt bỏ phần '#nonce' (nếu có) rồi lấy số định danh ở cuối: "GOPARK-CHECKIN:1" -> 1
   const base = text.split('#')[0].trim();
   const m = base.match(/(\d+)\s*$/);
   return m ? Number(m[1]) : null;
+}
+
+function parseBookingToken(text: string): string | null {
+  const base = text.split('#')[0].trim();
+  if (base.startsWith('GOPARK-BOOKING:')) return base.slice('GOPARK-BOOKING:'.length);
+  return null;
 }
 
 function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
@@ -83,6 +92,10 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
   const [ocrMsg, setOcrMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  // Booking check-in mode
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [bookingBusy, setBookingBusy] = useState(false);
+
   const reset = () => {
     setUserId(null);
     setPlate('');
@@ -91,6 +104,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     setError('');
     setOcrBusy(false);
     setOcrMsg('');
+    setBooking(null);
   };
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,7 +130,26 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     }
   };
 
-  const confirm = async () => {
+  const onScan = async (text: string) => {
+    setError('');
+    // Check if it's a booking QR
+    const bookingToken = parseBookingToken(text);
+    if (bookingToken) {
+      try {
+        const r = await api.lookupBooking(bookingToken);
+        setBooking(r.booking);
+      } catch (e: any) {
+        setError(e.message);
+      }
+      return;
+    }
+    // Otherwise treat as walk-in check-in QR
+    const id = parseUserId(text);
+    if (id) setUserId(id);
+    else setError('Mã không hợp lệ');
+  };
+
+  const confirmWalkin = async () => {
     if (!userId || !plate.trim()) {
       setError('Cần quét QR người dùng và nhập biển số.');
       return;
@@ -134,6 +167,21 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     }
   };
 
+  const confirmBooking = async () => {
+    if (!booking) return;
+    setBookingBusy(true);
+    setError('');
+    try {
+      const r = await api.convertBookingToCheckin(booking.id);
+      setResult(r.session);
+      onDone();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBookingBusy(false);
+    }
+  };
+
   if (result) {
     return (
       <div className="mx-auto max-w-md text-center">
@@ -148,81 +196,108 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
         </div>
         <button onClick={reset} className="btn-green mt-5 w-full">Check-in xe khác</button>
       </div>
+    )
+  };
+
+  // Booking check-in flow
+  if (booking) {
+    return (
+      <div className="mx-auto max-w-md space-y-4">
+        <div className="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-blue-700">
+          <IconCalendar width={18} /> Đặt chỗ trước #{booking.id}
+          <button onClick={() => setBooking(null)} className="ml-auto text-sm underline">Quét lại</button>
+        </div>
+        <div className="space-y-2 rounded-xl bg-slate-50 p-4 text-sm">
+          <Line label="Biển số" value={<PlateDisplay plate={booking.plate} />} />
+          <Line label="Giờ hẹn" value={formatDateTime(booking.scheduled_at)} />
+          <Line label="Hết hạn lúc" value={formatDateTime(booking.expires_at)} />
+        </div>
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+        <button onClick={confirmBooking} disabled={bookingBusy} className="btn-green w-full">
+          {bookingBusy ? 'Đang xử lý…' : 'Xác nhận xe vào (từ đặt chỗ)'}
+        </button>
+        <button onClick={() => setBooking(null)} className="w-full text-sm text-slate-400 underline">
+          Huỷ
+        </button>
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <div>
-        <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
-          <Num n={1} /> Quét mã QR định danh của khách
-        </h4>
-        {userId ? (
-          <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-brand-700">
-            <IconQr width={18} /> Đã nhận diện khách <b>#{userId}</b>
-            <button onClick={() => setUserId(null)} className="ml-auto text-sm underline">Quét lại</button>
-          </div>
-        ) : (
-          <QrScanner
-            hint="Khách mở app GoPark → tab Tài khoản → “Mã QR Check-in” để bạn quét. Không quét được? Nhập số định danh của khách bên dưới (vd: 1)."
-            manualLabel="Hoặc nhập số định danh khách"
-            manualPlaceholder="vd: 1"
-            onResult={(t) => {
-              const id = parseUserId(t);
-              if (id) setUserId(id);
-              else setError('Mã không hợp lệ');
-            }}
-          />
-        )}
+    <div className="space-y-4">
+      {/* Walk-in vs Booking toggle hint */}
+      <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-xs text-blue-700">
+        Quét <b>QR định danh</b> (xe vào thường) hoặc <b>QR Đặt chỗ</b> (khách đã đặt trước) — hệ thống tự nhận loại.
       </div>
 
-      <div className="space-y-4">
+      <div className="grid gap-6 md:grid-cols-2">
         <div>
           <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
-            <Num n={2} /> Biển số xe
+            <Num n={1} /> Quét mã QR của khách
           </h4>
-          <p className="mb-2 text-xs text-slate-400">
-            Tải ảnh biển số → hệ thống <b>tự đọc (OCR)</b> rồi điền vào ô bên dưới. Vui lòng kiểm tra lại.
-          </p>
-          <div
-            onClick={() => !ocrBusy && fileRef.current?.click()}
-            className="relative flex min-h-[7rem] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-6 text-slate-400 hover:border-brand-300"
-          >
-            {photo ? (
-              <img src={photo} alt="biển số" className="h-24 rounded-lg object-cover" />
-            ) : (
-              <>
-                <IconCamera /> Tải ảnh biển số
-              </>
+          {userId ? (
+            <div className="flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-brand-700">
+              <IconQr width={18} /> Đã nhận diện khách <b>#{userId}</b>
+              <button onClick={() => setUserId(null)} className="ml-auto text-sm underline">Quét lại</button>
+            </div>
+          ) : (
+            <QrScanner
+              hint={CHECKIN_HINT}
+              manualLabel="Hoặc nhập số định danh / mã đặt chỗ"
+              manualPlaceholder="vd: 1 hoặc ABC123"
+              onResult={onScan}
+            />
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
+              <Num n={2} /> Biển số xe
+            </h4>
+            <p className="mb-2 text-xs text-slate-400">
+              Tải ảnh biển số → hệ thống <b>tự đọc (OCR)</b> rồi điền vào ô bên dưới. Vui lòng kiểm tra lại.
+            </p>
+            <div
+              onClick={() => !ocrBusy && fileRef.current?.click()}
+              className="relative flex min-h-[7rem] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 py-6 text-slate-400 hover:border-brand-300"
+            >
+              {photo ? (
+                <img src={photo} alt="biển số" className="h-24 rounded-lg object-cover" />
+              ) : (
+                <>
+                  <IconCamera /> Tải ảnh biển số
+                </>
+              )}
+              {ocrBusy && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/85 text-brand-700">
+                  <span className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
+                  <span className="text-sm font-medium">Đang đọc biển số… {Math.round(ocrProgress * 100)}%</span>
+                </div>
+              )}
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
+          </div>
+          <div>
+            <label className="label">Biển số (kiểm tra / sửa) *</label>
+            <input
+              className="input font-mono uppercase tracking-wide"
+              placeholder="51F-123.45"
+              value={plate}
+              onChange={(e) => setPlate(e.target.value.toUpperCase())}
+            />
+            {!ocrBusy && ocrMsg === 'ok' && (
+              <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh — sửa lại nếu chưa đúng.</p>
             )}
-            {ocrBusy && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/85 text-brand-700">
-                <span className="h-6 w-6 animate-spin rounded-full border-2 border-brand-200 border-t-brand-600" />
-                <span className="text-sm font-medium">Đang đọc biển số… {Math.round(ocrProgress * 100)}%</span>
-              </div>
+            {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
+              <p className="mt-1 text-xs text-amber-600">⚠ {ocrMsg}</p>
             )}
           </div>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={onFile} />
+          {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
+          <button onClick={confirmWalkin} disabled={busy} className="btn-green w-full">
+            {busy ? 'Đang xử lý…' : 'Xác nhận xe vào'}
+          </button>
         </div>
-        <div>
-          <label className="label">Biển số (kiểm tra / sửa) *</label>
-          <input
-            className="input font-mono uppercase tracking-wide"
-            placeholder="51F-123.45"
-            value={plate}
-            onChange={(e) => setPlate(e.target.value.toUpperCase())}
-          />
-          {!ocrBusy && ocrMsg === 'ok' && (
-            <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh — sửa lại nếu chưa đúng.</p>
-          )}
-          {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
-            <p className="mt-1 text-xs text-amber-600">⚠ {ocrMsg}</p>
-          )}
-        </div>
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>}
-        <button onClick={confirm} disabled={busy} className="btn-green w-full">
-          {busy ? 'Đang xử lý…' : 'Xác nhận xe vào'}
-        </button>
       </div>
     </div>
   );
@@ -344,7 +419,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
         ) : (
           <>
             <QrScanner
-              hint="Khách mở tab “Vé của tôi” → “Mã QR Checkout” để bạn quét. Không quét được? Nhập mã ngắn (6 ký tự) khách đọc cho bạn vào ô bên dưới."
+              hint={'Khách mở tab "Vé của tôi" → "Mã QR Checkout" để bạn quét. Không quét được? Nhập mã ngắn (6 ký tự) khách đọc cho bạn vào ô bên dưới.'}
               manualLabel="Hoặc nhập mã checkout (6 ký tự)"
               manualPlaceholder="VD: ABC123"
               onResult={onScan}

@@ -28,19 +28,28 @@ export function LotCard({ lot, onClick }: { lot: Lot; onClick?: () => void }) {
         <p className="mt-0.5 flex items-center gap-1 truncate text-xs text-slate-400">
           <IconPin width={13} /> {lot.address}
         </p>
-        <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+        <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
           <span className="flex items-center gap-1 font-medium text-amber-500">
             <IconStar width={13} /> {lot.rating.toFixed(1)}
           </span>
+          <span className="text-slate-300">·</span>
           <span className="flex items-center gap-1" style={{ color: cap.color }}>
             <span className="h-2 w-2 rounded-full" style={{ background: cap.color }} />
             {lot.available_spots} chỗ
           </span>
-          {lot.distance != null && <span>· {formatDistance(lot.distance)}</span>}
+          {lot.distance != null && (
+            <>
+              <span className="text-slate-300">·</span>
+              <span>{formatDistance(lot.distance)}</span>
+            </>
+          )}
           {lot.covered && (
-            <span className="flex items-center gap-1 text-slate-400">
-              <IconRoof width={13} /> Mái che
-            </span>
+            <>
+              <span className="text-slate-300">·</span>
+              <span className="flex items-center gap-1 text-slate-400">
+                <IconRoof width={13} /> Mái che
+              </span>
+            </>
           )}
         </div>
       </div>

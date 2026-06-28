@@ -92,6 +92,21 @@ export interface Session {
   };
 }
 
+export interface Booking {
+  id: number;
+  lot_id: number;
+  user_id: number;
+  plate: string;
+  scheduled_at: number;
+  expires_at: number;
+  booking_token: string;
+  short_code: string;
+  status: 'pending' | 'checked_in' | 'cancelled' | 'expired';
+  session_id: number | null;
+  created_at: number;
+  lot: { id: number; name: string; address: string };
+}
+
 export interface ActivityEvent {
   type: 'checkin' | 'checkout';
   plate: string;
@@ -174,4 +189,19 @@ export const api = {
       `/sessions/${id}/checkout`,
       { method: 'POST', body: JSON.stringify({ plate }) }
     ),
+
+  // bookings
+  createBooking: (lotId: number, plate: string, scheduledAt: number) =>
+    request<{ booking: Booking }>('/bookings', {
+      method: 'POST',
+      body: JSON.stringify({ lotId, plate, scheduledAt }),
+    }),
+  activeBookings: () => request<{ bookings: Booking[] }>('/bookings/active'),
+  bookingHistory: () => request<{ bookings: Booking[] }>('/bookings/history'),
+  cancelBooking: (id: number) =>
+    request<{ ok: boolean }>(`/bookings/${id}`, { method: 'DELETE' }),
+  lookupBooking: (q: string) =>
+    request<{ booking: Booking }>(`/bookings/lookup?q=${encodeURIComponent(q)}`),
+  convertBookingToCheckin: (id: number) =>
+    request<{ session: Session }>(`/bookings/${id}/checkin`, { method: 'POST' }),
 };
