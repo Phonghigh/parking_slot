@@ -280,7 +280,7 @@ export function MapPage() {
 
   return (
     <div className="relative h-full overflow-hidden">
-      {/* ── Map — full screen background ────────────────────────── */}
+      {/* ── Map - full screen background ────────────────────────── */}
       <MapView
         center={center}
         userPos={userPos}

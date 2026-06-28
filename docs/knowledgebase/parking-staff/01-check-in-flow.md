@@ -1,8 +1,8 @@
-# Parking Staff — Check-In Flow
+# Parking Staff - Check-In Flow
 
 **Summary:** Step-by-step flow for a lot attendant processing a commuter's vehicle entry.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F2 — Mode A (Staff-assisted check-in)
+**Related PRD section:** F2 - Mode A (Staff-assisted check-in)
 
 ---
 
@@ -20,7 +20,7 @@
 5. Staff visually confirms plate matches the physical vehicle
 6. Staff taps **"Xác nhận vào bãi"**
 7. System creates Session; lot capacity decrements by 1
-8. Staff sees confirmation: "Đã vào — [Plate] lúc HH:MM"
+8. Staff sees confirmation: "Đã vào - [Plate] lúc HH:MM"
 
 ## Fallback: No QR Available
 

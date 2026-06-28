@@ -1,8 +1,8 @@
-# Parking Partner — Scheduling
+# Parking Partner - Scheduling
 
 **Summary:** How partners configure their lot's operating hours and availability windows.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** Parking Partner — Registration (operating hours field)
+**Related PRD section:** Parking Partner - Registration (operating hours field)
 
 ---
 

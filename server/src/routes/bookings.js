@@ -34,7 +34,7 @@ function enrichSession(session) {
   };
 }
 
-// POST /api/bookings — commuter creates a booking
+// POST /api/bookings - commuter creates a booking
 router.post('/', requireRole('commuter'), (req, res) => {
   const { lotId, plate, scheduledAt } = req.body || {};
   if (!lotId || !plate || !scheduledAt)
@@ -79,7 +79,7 @@ router.post('/', requireRole('commuter'), (req, res) => {
   res.json({ booking: enrichBooking(booking) });
 });
 
-// GET /api/bookings/active — commuter's pending bookings
+// GET /api/bookings/active - commuter's pending bookings
 router.get('/active', requireRole('commuter'), (req, res) => {
   const rows = db.prepare(
     "SELECT * FROM bookings WHERE user_id = ? AND status = 'pending' ORDER BY scheduled_at ASC"
@@ -87,7 +87,7 @@ router.get('/active', requireRole('commuter'), (req, res) => {
   res.json({ bookings: rows.map(enrichBooking) });
 });
 
-// GET /api/bookings/history — commuter's past bookings
+// GET /api/bookings/history - commuter's past bookings
 router.get('/history', requireRole('commuter'), (req, res) => {
   const rows = db.prepare(
     "SELECT * FROM bookings WHERE user_id = ? AND status != 'pending' ORDER BY created_at DESC"
@@ -95,7 +95,7 @@ router.get('/history', requireRole('commuter'), (req, res) => {
   res.json({ bookings: rows.map(enrichBooking) });
 });
 
-// DELETE /api/bookings/:id — commuter cancels booking
+// DELETE /api/bookings/:id - commuter cancels booking
 router.delete('/:id', requireRole('commuter'), (req, res) => {
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(req.params.id);
   if (!booking) return res.status(404).json({ error: 'Không tìm thấy đặt chỗ' });
@@ -108,7 +108,7 @@ router.delete('/:id', requireRole('commuter'), (req, res) => {
   res.json({ ok: true });
 });
 
-// GET /api/bookings/lookup?q=<token|short_code> — owner looks up a pending booking
+// GET /api/bookings/lookup?q=<token|short_code> - owner looks up a pending booking
 router.get('/lookup', requireRole('owner'), (req, res) => {
   const q = (req.query.q || '').toString().trim();
   if (!q) return res.status(400).json({ error: 'Thiếu mã đặt chỗ' });
@@ -135,7 +135,7 @@ router.get('/lookup', requireRole('owner'), (req, res) => {
   res.json({ booking: enrichBooking(booking) });
 });
 
-// POST /api/bookings/:id/checkin — owner converts booking → active session
+// POST /api/bookings/:id/checkin - owner converts booking → active session
 router.post('/:id/checkin', requireRole('owner'), (req, res) => {
   const booking = db.prepare('SELECT * FROM bookings WHERE id = ?').get(req.params.id);
   if (!booking) return res.status(404).json({ error: 'Không tìm thấy đặt chỗ' });
@@ -167,7 +167,7 @@ router.post('/:id/checkin', requireRole('owner'), (req, res) => {
 
   const sessionId = Number(info.lastInsertRowid);
   db.prepare("UPDATE bookings SET status = 'checked_in', session_id = ? WHERE id = ?").run(sessionId, booking.id);
-  // available_spots already held when booking was created — do not decrement again
+  // available_spots already held when booking was created - do not decrement again
 
   const session = db.prepare('SELECT * FROM sessions WHERE id = ?').get(sessionId);
   res.json({ session: enrichSession(session) });

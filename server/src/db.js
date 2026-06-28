@@ -92,6 +92,16 @@ export function initSchema() {
       FOREIGN KEY (user_id) REFERENCES users(id),
       FOREIGN KEY (session_id) REFERENCES sessions(id)
     );
+
+    CREATE TABLE IF NOT EXISTS vehicles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      plate TEXT NOT NULL,
+      label TEXT,
+      created_at INTEGER NOT NULL,
+      UNIQUE(user_id, plate),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
   `);
 
   // Migration an toàn cho DB cũ (thêm cột nếu thiếu)

@@ -1,5 +1,5 @@
 export function formatVnd(amount: number | null | undefined): string {
-  if (amount == null) return '—';
+  if (amount == null) return '-';
   return amount.toLocaleString('vi-VN') + 'đ';
 }
 

@@ -56,7 +56,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   const lot = db.prepare('SELECT * FROM lots WHERE id = ?').get(req.params.id);
   if (!lot) return res.status(404).json({ error: 'Không tìm thấy bãi' });
-  const user = getUserFromReq(req); // tuỳ chọn — không bắt buộc đăng nhập
+  const user = getUserFromReq(req); // tuỳ chọn - không bắt buộc đăng nhập
   const canReview = !!(user && user.role === 'commuter' && hasSessionAtLot(user.id, lot.id));
   res.json({ lot: { ...serializeLot(lot), reviews: loadReviews(lot.id), can_review: canReview } });
 });

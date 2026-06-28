@@ -4,7 +4,7 @@ Centralized parking management platform for Vietnamese commuters near Metro and 
 
 ## What it does
 
-Commuters find nearby parking lots on a map, check in with a QR code (no paper ticket), and check out with fee calculated automatically. Parking lot owners register their space and manage sessions via a partner interface. Everything runs in the browser — no native app required.
+Commuters find nearby parking lots on a map, check in with a QR code (no paper ticket), and check out with fee calculated automatically. Parking lot owners register their space and manage sessions via a partner interface. Everything runs in the browser - no native app required.
 
 **MVP scope:**
 - Real-time map search with capacity indicators
@@ -46,7 +46,7 @@ cd server && npm install && npm run seed && npm run dev   # http://localhost:400
 cd web && npm install && npm run dev                      # http://localhost:5173
 ```
 
-Demo accounts (password `123456`): `commuter1` (người gửi xe). Mỗi owner gắn **đúng 1 bãi** —
+Demo accounts (password `123456`): `commuter1` (người gửi xe). Mỗi owner gắn **đúng 1 bãi** -
 `owner1` quản lý "Bãi Đỗ Xe Vincom Center" (có sẵn dữ liệu cho dashboard analytics); `owner2`…`owner12`
 cho các bãi còn lại.
 Full demo walkthrough + notes: see [`web`](web/) and the plan at
@@ -75,7 +75,7 @@ CLAUDE.md                 # Project context for AI-assisted development
 3. Staff scans QR → system opens session `{ userID, lotID, plate, checkInTime }`
 4. Push notification sent to commuter
 
-### Check-Out (MVP — cash)
+### Check-Out (MVP - cash)
 1. Commuter opens Active Session → sees elapsed time + running fee
 2. App shows Checkout QR
 3. Staff scans → fee displayed → staff collects cash → confirms
@@ -109,8 +109,8 @@ Full product requirements: [`.claude/plans/nh-m-1-scope-reflective-haven.md`](.c
 
 UI/UX specifications: [`docs/knowledgebase/ui-ux/`](docs/knowledgebase/ui-ux/)
 
-- [Design System](docs/knowledgebase/ui-ux/01-design-system.md) — colors, typography, spacing
-- [Commuter Screens](docs/knowledgebase/ui-ux/02-screens-commuter.md) — 7 screens with wireframes
-- [Partner Screens](docs/knowledgebase/ui-ux/03-screens-partner.md) — dashboard, scanner, session list
-- [Components](docs/knowledgebase/ui-ux/04-components.md) — buttons, QR display, capacity bar, toasts
-- [Interaction Patterns](docs/knowledgebase/ui-ux/05-interaction-patterns.md) — animations, Vietnamese UX, offline behavior
+- [Design System](docs/knowledgebase/ui-ux/01-design-system.md) - colors, typography, spacing
+- [Commuter Screens](docs/knowledgebase/ui-ux/02-screens-commuter.md) - 7 screens with wireframes
+- [Partner Screens](docs/knowledgebase/ui-ux/03-screens-partner.md) - dashboard, scanner, session list
+- [Components](docs/knowledgebase/ui-ux/04-components.md) - buttons, QR display, capacity bar, toasts
+- [Interaction Patterns](docs/knowledgebase/ui-ux/05-interaction-patterns.md) - animations, Vietnamese UX, offline behavior

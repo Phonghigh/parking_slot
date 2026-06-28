@@ -1,4 +1,4 @@
-# Core — Data Model
+# Core - Data Model
 
 **Summary:** Canonical entity definitions for the ParkHub platform.  
 **Last updated:** 2026-06-27  
@@ -14,7 +14,7 @@ User {
   userID:      uuid
   phone:       string (unique, OTP-verified)
   name:        string
-  cccd:        string (encrypted — fallback identity)
+  cccd:        string (encrypted - fallback identity)
   vehicles:    Vehicle[]
   createdAt:   datetime
 }

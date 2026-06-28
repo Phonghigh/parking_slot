@@ -1,8 +1,8 @@
-# Commuter — Search & Discovery
+# Commuter - Search & Discovery
 
 **Summary:** How commuters find available parking lots near a transit station or location in real time.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F1 — Parking Space Search & Real-Time Capacity
+**Related PRD section:** F1 - Parking Space Search & Real-Time Capacity
 
 ---
 

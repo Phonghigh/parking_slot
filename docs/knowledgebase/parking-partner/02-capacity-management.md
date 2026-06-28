@@ -1,19 +1,19 @@
-# Parking Partner — Capacity Management
+# Parking Partner - Capacity Management
 
 **Summary:** How a partner's lot capacity is tracked and updated in real time.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** Parking Partner — Capacity Management
+**Related PRD section:** Parking Partner - Capacity Management
 
 ---
 
 ## Two Update Modes
 
-### Mode A — Staff-assisted (manual)
+### Mode A - Staff-assisted (manual)
 - Staff uses Partner app to manually +/- slot count
 - Triggered when a vehicle enters or exits
 - UI: large +1 / -1 buttons on the Partner dashboard home screen
 
-### Mode B — Automated (barrier/camera)
+### Mode B - Automated (barrier/camera)
 - Hardware barrier or camera system sends events to Partner API
 - System auto-increments/decrements slot count on each trigger
 - No staff action required

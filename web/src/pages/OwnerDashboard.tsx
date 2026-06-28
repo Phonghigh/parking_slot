@@ -93,7 +93,7 @@ export function OwnerDashboard() {
           value={formatVnd(stats.todayEarnings)}
           foot={
             stats.earningsDeltaPct == null ? (
-              <span className="text-slate-400">—</span>
+              <span className="text-slate-400">-</span>
             ) : (
               <Trend up={stats.earningsDeltaPct >= 0} text={`${Math.abs(stats.earningsDeltaPct)}% so với hôm qua`} />
             )

@@ -1,4 +1,4 @@
-# UI/UX — Partner & Staff Screens
+# UI/UX - Partner & Staff Screens
 
 **Last updated:** 2026-06-27  
 **Related PRD section:** Parking Partner features, Parking Staff flows
@@ -21,7 +21,7 @@ Partner Login
 
 ---
 
-## 1. Partner Dashboard — Home
+## 1. Partner Dashboard - Home
 
 **Purpose:** At-a-glance view of capacity and today's activity.  
 **Target device:** Mobile (staff on floor) + Desktop (office manager)
@@ -62,7 +62,7 @@ Partner Login
 
 ---
 
-## 2. QR Scanner — Check-In
+## 2. QR Scanner - Check-In
 
 **Purpose:** Scan commuter's QR to open a session.
 
@@ -88,7 +88,7 @@ Partner Login
 └─────────────────────────────┘
 ```
 
-**After scan — Confirmation card:**
+**After scan - Confirmation card:**
 
 ```
 ┌─────────────────────────────┐
@@ -107,11 +107,11 @@ Partner Login
 
 ---
 
-## 3. QR Scanner — Check-Out
+## 3. QR Scanner - Check-Out
 
 **Purpose:** Scan commuter's checkout QR to close a session and show fee.
 
-**After scan — Fee card:**
+**After scan - Fee card:**
 
 ```
 ┌─────────────────────────────┐
@@ -130,7 +130,7 @@ Partner Login
 │  │                       │  │
 │  └───────────────────────┘  │
 │                             │
-│  [ ✅ ĐÃ THU TIỀN — CHO RA]│  green, full-width
+│  [ ✅ ĐÃ THU TIỀN - CHO RA]│  green, full-width
 │  [    Huỷ    ]              │
 └─────────────────────────────┘
 ```

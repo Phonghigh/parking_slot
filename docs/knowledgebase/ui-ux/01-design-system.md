@@ -1,7 +1,7 @@
-# UI/UX — Design System
+# UI/UX - Design System
 
 **Last updated:** 2026-06-27  
-**Related PRD section:** Platform — Web App (responsive, mobile-first)
+**Related PRD section:** Platform - Web App (responsive, mobile-first)
 
 ---
 
@@ -10,7 +10,7 @@
 | Principle | Rationale |
 |---|---|
 | **Mobile-first** | Vietnamese commuters primarily access on phone browsers |
-| **Speed over decoration** | Users are in transit — 3-tap max to complete any core action |
+| **Speed over decoration** | Users are in transit - 3-tap max to complete any core action |
 | **Trust signals everywhere** | B2G context; must feel official, not startup-y |
 | **Vietnamese-native** | All copy, date formats, currency in Vietnamese convention |
 
@@ -18,15 +18,15 @@
 
 ## Color Palette
 
-### Primary — Grab Green
+### Primary - Grab Green
 | Token | Hex | Usage |
 |---|---|---|
-| `primary-500` | `#00B14F` | Main brand color — CTA buttons, active nav, links |
+| `primary-500` | `#00B14F` | Main brand color - CTA buttons, active nav, links |
 | `primary-600` | `#009A45` | Hover states, pressed buttons |
-| `primary-700` | `#007A35` | Dark variant — text on light bg, focus rings |
+| `primary-700` | `#007A35` | Dark variant - text on light bg, focus rings |
 | `primary-50`  | `#E6F9EE` | Light backgrounds, selected states, success tint |
 
-### Capacity Status (critical — used on map markers + badges)
+### Capacity Status (critical - used on map markers + badges)
 | Token | Hex | Meaning |
 |---|---|---|
 | `status-green` | `#0E9F6E` | >50% slots available |
@@ -55,7 +55,7 @@
 
 ## Typography
 
-**Primary font:** `Inter` (Latin) + `Be Vietnam Pro` (Vietnamese — better diacritic rendering)  
+**Primary font:** `Inter` (Latin) + `Be Vietnam Pro` (Vietnamese - better diacritic rendering)  
 **Fallback:** System UI sans-serif stack
 
 ### Scale

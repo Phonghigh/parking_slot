@@ -124,7 +124,7 @@ export function HistoryPage() {
                 <div className="mt-3 flex items-end justify-between border-t border-white/40 pt-3">
                   <div className="text-xs text-slate-500">
                     <p>Vào: {formatDateTime(s.checkin_at)}</p>
-                    <p>Ra: {s.checkout_at ? formatDateTime(s.checkout_at) : '—'}</p>
+                    <p>Ra: {s.checkout_at ? formatDateTime(s.checkout_at) : '-'}</p>
                     {s.payment_method && (
                       <span className="glass-white mt-1.5 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
                         {PM_LABEL[s.payment_method]}

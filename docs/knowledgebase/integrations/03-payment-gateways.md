@@ -1,8 +1,8 @@
-# Integrations — Payment Gateways
+# Integrations - Payment Gateways
 
 **Summary:** Online payment integration for checkout fees (Phase 2).  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F4 — Online Payment (Phase 2)
+**Related PRD section:** F4 - Online Payment (Phase 2)
 
 ---
 
@@ -45,6 +45,6 @@ Session closes
 
 ## Security Notes
 
-- ParkHub never stores raw card numbers — all tokenized via gateway SDK
+- ParkHub never stores raw card numbers - all tokenized via gateway SDK
 - PCI DSS compliance delegated to gateway provider
 - Server-side payment verification required before closing barrier (prevent race condition)

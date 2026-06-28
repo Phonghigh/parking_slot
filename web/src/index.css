@@ -45,7 +45,7 @@
     background: rgba(255, 255, 255, 0.12);
   }
 
-  /* Green gradient CTA — dùng cho Parking Partner (brand xanh) */
+  /* Green gradient CTA - dùng cho Parking Partner (brand xanh) */
   .btn-green {
     color: white;
     border-radius: 9999px;
@@ -171,7 +171,7 @@
       0 -4px 24px rgba(31, 38, 135, 0.07);
   }
 
-  /* ── Tinted glass — semantic colors ───────────────────────────── */
+  /* ── Tinted glass - semantic colors ───────────────────────────── */
   .glass-green {
     background: rgba(0, 177, 79, 0.10);
     backdrop-filter: blur(20px) saturate(200%);
@@ -324,7 +324,7 @@
       0 4px 20px rgba(0, 177, 79, 0.22),
       0 1px 4px rgba(0, 0, 0, 0.06);
     pointer-events: none;
-    /* phase-1 stretch: fast, no spring — blob bridges source to destination */
+    /* phase-1 stretch: fast, no spring - blob bridges source to destination */
     transition: left 0.15s ease-out, width 0.15s ease-out;
   }
   .blob-indicator.landing {
@@ -334,7 +334,7 @@
       width 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Tab blob — dark charcoal pill (for in-page segmented controls) */
+  /* Tab blob - dark charcoal pill (for in-page segmented controls) */
   .blob-tab {
     position: absolute;
     top: 50%;

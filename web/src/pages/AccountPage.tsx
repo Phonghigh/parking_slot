@@ -1,11 +1,49 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { api, Vehicle } from '../api';
 import { formatVnd } from '../lib/format';
-import { IconUser, IconWallet, IconQr, IconLogout } from '../components/icons';
+import { IconUser, IconWallet, IconQr, IconLogout, IconCar, IconCheck } from '../components/icons';
 
 export function AccountPage() {
   const { user, logout } = useAuth();
   const nav = useNavigate();
+
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [addingPlate, setAddingPlate] = useState('');
+  const [addingLabel, setAddingLabel] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [addBusy, setAddBusy] = useState(false);
+  const [addError, setAddError] = useState('');
+
+  useEffect(() => {
+    api.listVehicles().then((r) => setVehicles(r.vehicles)).catch(() => {});
+  }, []);
+
+  const submitAdd = async () => {
+    const plate = addingPlate.trim().toUpperCase();
+    if (!plate) { setAddError('Nhập biển số xe'); return; }
+    setAddBusy(true);
+    setAddError('');
+    try {
+      const r = await api.addVehicle(plate, addingLabel.trim() || undefined);
+      setVehicles((prev) => [...prev, r.vehicle]);
+      setAddingPlate('');
+      setAddingLabel('');
+      setShowAddForm(false);
+    } catch (e: any) {
+      setAddError(e.message);
+    } finally {
+      setAddBusy(false);
+    }
+  };
+
+  const removeVehicle = async (id: number) => {
+    try {
+      await api.deleteVehicle(id);
+      setVehicles((prev) => prev.filter((v) => v.id !== id));
+    } catch {}
+  };
 
   const doLogout = () => {
     logout();
@@ -45,7 +83,99 @@ export function AccountPage() {
         </div>
       </div>
 
-      {/* Action list */}
+      {/* ── Vehicles ────────────────────────────────────────────── */}
+      <div className="card mt-3 p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <IconCar width={16} className="text-slate-500" />
+            <span className="font-semibold text-slate-800">Xe của tôi</span>
+            {vehicles.length > 0 && (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-500">
+                {vehicles.length}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => { setShowAddForm((v) => !v); setAddError(''); }}
+            className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition active:scale-95 ${
+              showAddForm ? 'bg-slate-100 text-slate-600' : 'bg-blue-500 text-white'
+            }`}
+          >
+            {showAddForm ? 'Hủy' : '+ Thêm xe'}
+          </button>
+        </div>
+
+        {/* Add form */}
+        {showAddForm && (
+          <div className="mb-3 space-y-2 rounded-2xl bg-slate-50 p-3">
+            <input
+              className="input font-mono uppercase tracking-widest"
+              placeholder="Biển số xe *  (VD: 51F-123.45)"
+              value={addingPlate}
+              autoFocus
+              onChange={(e) => setAddingPlate(e.target.value.toUpperCase())}
+              onKeyDown={(e) => e.key === 'Enter' && submitAdd()}
+            />
+            <input
+              className="input"
+              placeholder="Tên gợi nhớ  (VD: Xe máy hàng ngày)"
+              value={addingLabel}
+              onChange={(e) => setAddingLabel(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && submitAdd()}
+            />
+            {addError && (
+              <p className="text-xs text-red-500">{addError}</p>
+            )}
+            <button
+              onClick={submitAdd}
+              disabled={addBusy}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-blue-500 py-2.5 text-sm font-bold text-white transition active:scale-[0.98] disabled:opacity-60"
+            >
+              <IconCheck width={14} />
+              {addBusy ? 'Đang lưu…' : 'Lưu xe'}
+            </button>
+          </div>
+        )}
+
+        {/* Vehicle list */}
+        {vehicles.length === 0 && !showAddForm ? (
+          <p className="py-3 text-center text-sm text-slate-400">
+            Chưa có xe nào. Thêm xe để đặt chỗ nhanh hơn.
+          </p>
+        ) : (
+          <div className="space-y-2">
+            {vehicles.map((v) => (
+              <div
+                key={v.id}
+                className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-3.5 py-3"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100">
+                    <IconCar width={16} className="text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="font-mono text-sm font-bold tracking-wide text-slate-800">{v.plate}</p>
+                    {v.label && (
+                      <p className="text-xs text-slate-400">{v.label}</p>
+                    )}
+                  </div>
+                </div>
+                <button
+                  onClick={() => removeVehicle(v.id)}
+                  className="grid h-8 w-8 place-items-center rounded-full text-slate-300 transition hover:bg-red-50 hover:text-red-400 active:scale-90"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
       <div className="mt-3 space-y-2">
         <button
           onClick={() => nav('/checkin')}
@@ -72,7 +202,7 @@ export function AccountPage() {
         </button>
       </div>
 
-      <p className="mt-8 text-center text-xs text-slate-400/70">GoPark · MVP</p>
+      {/* <p className="mt-8 text-center text-xs text-slate-400/70">GoPark · MVP</p> */}
     </div>
   );
 }

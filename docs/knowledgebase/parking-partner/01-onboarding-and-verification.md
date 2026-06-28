@@ -1,8 +1,8 @@
-# Parking Partner — Onboarding & Verification
+# Parking Partner - Onboarding & Verification
 
 **Summary:** How a household or commercial lot registers as a ParkHub partner and gets verified.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** Parking Partner — Onboarding & Management
+**Related PRD section:** Parking Partner - Onboarding & Management
 
 ---
 
@@ -17,19 +17,19 @@
 
 - Lot name
 - Address (geocoded on submit)
-- Photos (exterior + interior — minimum 2)
+- Photos (exterior + interior - minimum 2)
 - Vehicle types accepted: motorbike | car | both
 - Total capacity (number of slots)
-- Operating hours (per-day schedule — see [03-scheduling.md](03-scheduling.md))
+- Operating hours (per-day schedule - see [03-scheduling.md](03-scheduling.md))
 - Fixed parking rate: per hour for motorbike, per hour for car
 - Check-in mode: Staff-assisted (Mode A) | Automated (Mode B)
 - Bank account for revenue settlement
 
 ## Automated Verification Steps
 
-1. **Geocoding check** — address confirmed within acceptable proximity to a transit hub
-2. **Photo completeness** — minimum photo count validated
-3. **CCCD scan** — identity document of lot owner uploaded and parsed
+1. **Geocoding check** - address confirmed within acceptable proximity to a transit hub
+2. **Photo completeness** - minimum photo count validated
+3. **CCCD scan** - identity document of lot owner uploaded and parsed
 4. **Auto-approve** if all checks pass → lot appears in search within minutes
 5. **Flag for manual review** if any check fails → partner notified
 

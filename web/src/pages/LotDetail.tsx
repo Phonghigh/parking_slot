@@ -126,7 +126,7 @@ export function LotDetail() {
         <section className="mt-6">
           <h2 className="font-bold text-slate-800">Đánh giá từ người dùng</h2>
 
-          {/* Form đánh giá — chỉ khi đã từng gửi xe tại bãi này */}
+          {/* Form đánh giá - chỉ khi đã từng gửi xe tại bãi này */}
           {lot.can_review ? (
             <ReviewForm
               lotId={lot.id}

@@ -333,7 +333,7 @@ export function SearchPage() {
       {/* ── Results ──────────────────────────────────────────────────────── */}
       <div className="no-scrollbar flex-1 overflow-y-auto">
 
-        {/* Empty state — show recent searches */}
+        {/* Empty state - show recent searches */}
         {showEmpty && (
           <div className="px-4 pt-4">
             {recent.length > 0 ? (

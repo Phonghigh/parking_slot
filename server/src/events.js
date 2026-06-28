@@ -1,4 +1,4 @@
-// Server-Sent Events (SSE) — đẩy cập nhật capacity bãi đỗ tới client theo thời gian thực.
+// Server-Sent Events (SSE) - đẩy cập nhật capacity bãi đỗ tới client theo thời gian thực.
 import { db } from './db.js';
 
 const clients = new Set();

@@ -1,8 +1,8 @@
-# Commuter — Account & Vehicles
+# Commuter - Account & Vehicles
 
 **Summary:** Commuter registration, profile management, and multi-vehicle support.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** User Account Features — Commuter
+**Related PRD section:** User Account Features - Commuter
 
 ---
 
@@ -23,13 +23,13 @@
 
 | Feature | MVP | Phase 2 |
 |---|---|---|
-| Register / add vehicle | ✅ | — |
-| View active session | ✅ | — |
-| View parking history | ✅ | — |
-| Push notifications | ✅ | — |
-| Rate & review lots | — | ✅ |
-| View receipts | — | ✅ |
-| In-app payment methods | — | ✅ |
+| Register / add vehicle | ✅ | - |
+| View active session | ✅ | - |
+| View parking history | ✅ | - |
+| Push notifications | ✅ | - |
+| Rate & review lots | - | ✅ |
+| View receipts | - | ✅ |
+| In-app payment methods | - | ✅ |
 
 ## Fallback Identity
 

@@ -1,8 +1,8 @@
-# Commuter — Check-In
+# Commuter - Check-In
 
 **Summary:** How a commuter opens a parking session when arriving at a lot.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F2 — Digital Check-In / Check-Out
+**Related PRD section:** F2 - Digital Check-In / Check-Out
 
 ---
 
@@ -16,14 +16,14 @@
 1. Commuter opens app → taps **"Tạo mã vào bãi"**
 2. If multiple vehicles registered → vehicle selector appears → commuter picks active vehicle
 3. App shows **static QR code** (tied to userID + selected plate)
-4. At lot entry — one of two modes:
+4. At lot entry - one of two modes:
 
-### Mode A — Staff-assisted
+### Mode A - Staff-assisted
 - Staff opens Partner app → scans commuter's QR
 - Staff confirms plate visually or via photo
 - Staff submits → session opens
 
-### Mode B — Automated (camera/barrier)
+### Mode B - Automated (camera/barrier)
 - Camera reads license plate
 - System cross-references against registered plate on account
 - Barrier opens, session opens automatically
@@ -34,7 +34,7 @@
 
 ## QR Code Details
 
-- Type: **Static** — permanent per account, not time-limited (MVP)
+- Type: **Static** - permanent per account, not time-limited (MVP)
 - Encodes: userID + primary plate (plate overridden by selection at check-in time)
 - Future (Phase 2): time-limited dynamic QR with 5-min expiry for improved security
 

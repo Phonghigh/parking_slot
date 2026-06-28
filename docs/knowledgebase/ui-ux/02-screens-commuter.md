@@ -1,7 +1,7 @@
-# UI/UX — Commuter Screens
+# UI/UX - Commuter Screens
 
 **Last updated:** 2026-06-27  
-**Related PRD section:** F1, F2 — Commuter features
+**Related PRD section:** F1, F2 - Commuter features
 
 ---
 
@@ -22,7 +22,7 @@ Splash / Onboarding
 
 ---
 
-## 1. Home — Map Search
+## 1. Home - Map Search
 
 **Purpose:** Find a parking lot near a transit station.
 
@@ -139,7 +139,7 @@ Bottom sheet on mobile. Full modal on desktop.
 **Behavior:**
 - Screen brightness forced to max
 - Wakelock API prevents screen sleep
-- QR is static — always the same image (cached, works offline)
+- QR is static - always the same image (cached, works offline)
 - Tap "Không có điện thoại?" → modal explaining CCCD/cà vẹt fallback
 
 ---
@@ -167,7 +167,7 @@ Bottom sheet on mobile. Full modal on desktop.
 │   (2 giờ × 5.000đ + 1 giờ) │  breakdown below
 │─────────────────────────────│
 │                             │
-│  [    LẤY XE — XUẤT BÃI   ]│  ← primary CTA
+│  [    LẤY XE - XUẤT BÃI   ]│  ← primary CTA
 │                             │
 └─────────────────────────────┘
 ```

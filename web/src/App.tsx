@@ -15,6 +15,7 @@ import { OwnerDashboard } from './pages/OwnerDashboard';
 import { OwnerOperations } from './pages/OwnerOperations';
 import { OwnerProfile } from './pages/OwnerProfile';
 import { SearchPage } from './pages/SearchPage';
+import { BookingPage } from './pages/BookingPage';
 
 export function App() {
   return (
@@ -22,7 +23,7 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Commuter (PWA mobile) — các tab chính có thanh điều hướng dưới */}
+      {/* Commuter (PWA mobile) - các tab chính có thanh điều hướng dưới */}
       <Route
         element={
           <ProtectedRoute role="commuter">
@@ -36,7 +37,7 @@ export function App() {
         <Route path="/account" element={<AccountPage />} />
       </Route>
 
-      {/* Commuter — trang push full-screen (không có tab bar) */}
+      {/* Commuter - trang push full-screen (không có tab bar) */}
       <Route
         element={
           <ProtectedRoute role="commuter">
@@ -45,6 +46,7 @@ export function App() {
         }
       >
         <Route path="/lot/:id" element={<LotDetail />} />
+        <Route path="/booking/:lotId" element={<BookingPage />} />
         <Route path="/checkin" element={<CheckinQrPage />} />
         <Route path="/search" element={<SearchPage />} />
       </Route>

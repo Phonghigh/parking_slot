@@ -1,12 +1,12 @@
-# Parking Staff — Check-Out Flow
+# Parking Staff - Check-Out Flow
 
 **Summary:** Step-by-step flow for a lot attendant processing a commuter's vehicle exit (MVP cash model).  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F2 — Mode A (Staff-assisted check-out)
+**Related PRD section:** F2 - Mode A (Staff-assisted check-out)
 
 ---
 
-## Steps (MVP — Cash)
+## Steps (MVP - Cash)
 
 1. Commuter presents checkout QR at exit
 2. Staff opens **"Quét mã ra"** in Partner app
@@ -20,9 +20,9 @@
 6. Staff taps **"Xác nhận thu tiền"**
 7. System closes Session; lot capacity increments by 1
 8. Commuter receives receipt push notification
-9. Staff sees: "Đã ra — [Plate] · [Fee]"
+9. Staff sees: "Đã ra - [Plate] · [Fee]"
 
-## Phase 2 — Online Payment
+## Phase 2 - Online Payment
 
 Steps 4–6 are replaced by:
 - App shows payment status (paid / pending)

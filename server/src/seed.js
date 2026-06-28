@@ -24,7 +24,7 @@ for (let i = 1; i <= 6; i++) {
   guestIds.push(Number(insertUser.run(`Khách ${i}`, `guest${i}`, '123456', 'commuter', 50000).lastInsertRowid));
 }
 
-// ---- Lots (quanh trung tâm TP.HCM) — MỖI BÃI 1 OWNER RIÊNG ----
+// ---- Lots (quanh trung tâm TP.HCM) - MỖI BÃI 1 OWNER RIÊNG ----
 const AM = {
   cam: 'Camera an ninh',
   mai: 'Có mái che',

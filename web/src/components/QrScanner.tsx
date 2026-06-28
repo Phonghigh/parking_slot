@@ -95,7 +95,7 @@ export function QrScanner({
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-center text-sm text-amber-700">{error}</p>
       )}
 
-      {/* Fallback nhập tay — luôn hiển thị rõ ràng */}
+      {/* Fallback nhập tay - luôn hiển thị rõ ràng */}
       <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
         <label className="mb-1.5 block text-sm font-medium text-slate-600">{manualLabel}</label>
         <div className="flex gap-2">

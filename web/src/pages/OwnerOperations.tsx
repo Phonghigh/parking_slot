@@ -119,8 +119,8 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
       if (text) {
         setPlate(text);
       } else {
-        console.warn('[OCR] readPlateFromImage returned empty string — check cleanPlate logs above');
-        setError('OCR không nhận ra biển số — vui lòng nhập tay.');
+        console.warn('[OCR] readPlateFromImage returned empty string - check cleanPlate logs above');
+        setError('OCR không nhận ra biển số - vui lòng nhập tay.');
       }
     } catch (e: any) {
       console.error('[OCR] readPlateFromImage threw:', e);
@@ -227,7 +227,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
     <div className="space-y-4">
       {/* Walk-in vs Booking toggle hint */}
       <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-2.5 text-xs text-blue-700">
-        Quét <b>QR định danh</b> (xe vào thường) hoặc <b>QR Đặt chỗ</b> (khách đã đặt trước) — hệ thống tự nhận loại.
+        Quét <b>QR định danh</b> (xe vào thường) hoặc <b>QR Đặt chỗ</b> (khách đã đặt trước) - hệ thống tự nhận loại.
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -287,7 +287,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
               onChange={(e) => setPlate(e.target.value.toUpperCase())}
             />
             {!ocrBusy && ocrMsg === 'ok' && (
-              <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh — sửa lại nếu chưa đúng.</p>
+              <p className="mt-1 text-xs text-brand-600">✓ Đã đọc từ ảnh - sửa lại nếu chưa đúng.</p>
             )}
             {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
               <p className="mt-1 text-xs text-amber-600">⚠ {ocrMsg}</p>
@@ -355,10 +355,10 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
         setLookupPlate(text);
         setOcrMsg('ok');
       } else {
-        setOcrMsg('Không đọc được biển số — vui lòng gõ tay.');
+        setOcrMsg('Không đọc được biển số - vui lòng gõ tay.');
       }
     } catch {
-      setOcrMsg('Lỗi xử lý ảnh — vui lòng gõ tay.');
+      setOcrMsg('Lỗi xử lý ảnh - vui lòng gõ tay.');
     } finally {
       setOcrBusy(false);
     }
@@ -437,7 +437,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
               {fallback && (
                 <div className="mt-2">
                   <p className="mb-2 text-xs text-amber-700/80">
-                    Tra phiên đang gửi theo <b>biển số xe</b> — chụp ảnh để OCR tự đọc hoặc gõ tay
+                    Tra phiên đang gửi theo <b>biển số xe</b> - chụp ảnh để OCR tự đọc hoặc gõ tay
                     (xác minh thêm bằng CCCD / cà vẹt xe).
                   </p>
 
@@ -456,7 +456,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
                   </div>
                   <input ref={fbFileRef} type="file" accept="image/*" capture="environment" hidden onChange={onPlatePhoto} />
                   {!ocrBusy && ocrMsg === 'ok' && (
-                    <p className="mb-2 text-xs text-brand-600">✓ Đã đọc từ ảnh — kiểm tra lại bên dưới.</p>
+                    <p className="mb-2 text-xs text-brand-600">✓ Đã đọc từ ảnh - kiểm tra lại bên dưới.</p>
                   )}
                   {!ocrBusy && ocrMsg && ocrMsg !== 'ok' && (
                     <p className="mb-2 text-xs text-amber-700">⚠ {ocrMsg}</p>

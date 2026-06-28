@@ -1,8 +1,8 @@
-# Core — Fallback Handling
+# Core - Fallback Handling
 
 **Summary:** All fallback paths when the primary QR/automated flow cannot be used.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F2 — Fallback (no phone / dead battery)
+**Related PRD section:** F2 - Fallback (no phone / dead battery)
 
 ---
 
@@ -46,6 +46,6 @@ If the lot has no internet connectivity:
 If the automated camera/barrier fails:
 
 1. Barrier stays closed
-2. Staff app receives alert: "Camera offline — switch to manual"
+2. Staff app receives alert: "Camera offline - switch to manual"
 3. Staff proceeds with QR scan (Mode A) until hardware is restored
 4. Lot automatically reverts to Mode B when hardware comes back online

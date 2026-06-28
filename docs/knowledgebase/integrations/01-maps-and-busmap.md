@@ -1,8 +1,8 @@
-# Integrations — Maps & BusMap
+# Integrations - Maps & BusMap
 
 **Summary:** How ParkHub integrates with Google Maps and BusMap for park-and-ride routing.  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F5 — Maps & Transit Integration (Phase 2)
+**Related PRD section:** F5 - Maps & Transit Integration (Phase 2)
 
 ---
 

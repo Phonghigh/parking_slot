@@ -1,4 +1,4 @@
-# ParkHub — Knowledgebase
+# ParkHub - Knowledgebase
 
 Living documentation for the ParkHub platform, organized by product module. Each file is updated whenever the corresponding feature changes.
 
@@ -17,6 +17,6 @@ Living documentation for the ParkHub platform, organized by product module. Each
 ## Contribution Guide
 
 - Update the relevant module doc **immediately** after any feature, flow, or schema change.
-- Keep each file under ~150 lines — split into sub-files if needed.
+- Keep each file under ~150 lines - split into sub-files if needed.
 - Update the **Last updated** field on every edit.
 - Use the **Related PRD section** link to trace back to requirements.

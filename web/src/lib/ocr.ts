@@ -1,5 +1,5 @@
 /**
- * Đọc biển số xe từ ảnh bằng OCR (Tesseract.js) — tối ưu cho biển số xe máy VN (2 dòng).
+ * Đọc biển số xe từ ảnh bằng OCR (Tesseract.js) - tối ưu cho biển số xe máy VN (2 dòng).
  * Chạy 2 biến thể tiền xử lý (giãn tương phản + nhị phân Otsu), thử cả 2 và chọn kết quả
  * giống biển số nhất → bền hơn với ảnh chụp thật (lóa sáng, viền tối, con dấu).
  * Dynamic import để không nạp thư viện OCR vào bundle chính.
@@ -15,7 +15,7 @@ export async function readPlateFromImage(
 
   const Tesseract = (await import('tesseract.js')).default;
 
-  // Pass 1 — full image (progress 0→70%)
+  // Pass 1 - full image (progress 0→70%)
   const { data } = await Tesseract.recognize(file, 'eng', {
     logger: (m: any) => {
       console.log(`[OCR] pass1 status="${m.status}" progress=${(m.progress * 100).toFixed(0)}%`);
@@ -39,7 +39,7 @@ export async function readPlateFromImage(
   // This happens when the VN national emblem between the province code and series letter
   // confuses Tesseract's line segmentation and the top line is dropped entirely.
   if (/^\d{3}\.?\d{2}$/.test(pass1)) {
-    console.warn('[OCR] only bottom line detected — starting pass 2 on top half of image');
+    console.warn('[OCR] only bottom line detected - starting pass 2 on top half of image');
     const topLine = await ocrTopHalf(file, Tesseract, (p) => onProgress?.(0.7 + p * 0.3));
     if (topLine) {
       const combined = `${topLine}-${pass1}`;
@@ -47,10 +47,10 @@ export async function readPlateFromImage(
       console.groupEnd();
       return combined;
     }
-    console.warn('[OCR] pass 2 also failed — returning bottom-only result');
+    console.warn('[OCR] pass 2 also failed - returning bottom-only result');
   }
 
-  console.log('[OCR] final plate:', pass1 || '(empty — nothing matched)');
+  console.log('[OCR] final plate:', pass1 || '(empty - nothing matched)');
   console.groupEnd();
   return pass1;
 }
@@ -282,7 +282,7 @@ export function cleanPlate(raw: string): string {
     candidates[0]?.l || lines.sort((a, b) => b.length - a.length)[0] || '';
 
   if (!candidates[0] && lines.length) {
-    console.warn('[OCR] no candidate passed score filter — falling back to longest line:', result);
+    console.warn('[OCR] no candidate passed score filter - falling back to longest line:', result);
   }
 
   console.groupEnd();

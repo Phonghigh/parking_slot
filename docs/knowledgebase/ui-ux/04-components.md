@@ -1,7 +1,7 @@
-# UI/UX — Component Library
+# UI/UX - Component Library
 
 **Last updated:** 2026-06-27  
-**Related PRD section:** Platform — Web App
+**Related PRD section:** Platform - Web App
 
 ---
 

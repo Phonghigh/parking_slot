@@ -1,4 +1,4 @@
-# ParkHub — Parking Slot Central System
+# ParkHub - Parking Slot Central System
 
 ## Project Overview
 
@@ -15,7 +15,7 @@ A centralized web platform that aggregates public and private parking spaces nea
 | Commuter         | Searches, books, checks in/out of parking           |
 | Parking Partner  | Household or commercial lot registering their space |
 | Parking Staff    | Lot attendant using Partner app to manage sessions  |
-| Admin/Government | Future roadmap — analytics dashboard                |
+| Admin/Government | Future roadmap - analytics dashboard                |
 
 ## Platform
 
@@ -24,8 +24,8 @@ A centralized web platform that aggregates public and private parking spaces nea
 
 ## MVP Features (Must Ship)
 
-- **F1** — Search parking on map + real-time capacity
-- **F2** — QR check-in / check-out (digital parking session, no paper ticket)
+- **F1** - Search parking on map + real-time capacity
+- **F2** - QR check-in / check-out (digital parking session, no paper ticket)
 
 ## Core Check-In/Out Logic
 
@@ -37,7 +37,7 @@ A centralized web platform that aggregates public and private parking spaces nea
 4. System opens Session `{ userID, lotID, plate, checkInTime }`
 5. Push notification sent to user
 
-### Check-Out (MVP — cash)
+### Check-Out (MVP - cash)
 
 1. User opens "Active Session" → sees elapsed time + fee calculated
 2. App shows Checkout QR (static QR + active sessionID)
@@ -64,10 +64,10 @@ A centralized web platform that aggregates public and private parking spaces nea
 
 ## Key Decisions
 
-- QR type: **Static** (tied to account, reused) — MVP simplicity
-- Multi-vehicle: **Yes** — user selects active vehicle at check-in
+- QR type: **Static** (tied to account, reused) - MVP simplicity
+- Multi-vehicle: **Yes** - user selects active vehicle at check-in
 - Partner pricing: Set at registration, not dynamic
-- Revenue model: **B2G** — pitched to government for funding
+- Revenue model: **B2G** - pitched to government for funding
 - Verification: **Automated** (geocoding + photo + CCCD scan)
 - Capacity update: Auto via barrier/camera OR manual staff input
 

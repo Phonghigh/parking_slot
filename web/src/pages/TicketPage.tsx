@@ -6,22 +6,27 @@ import { QrDisplay } from '../components/QrDisplay';
 import { PaymentSelector } from '../components/PaymentSelector';
 import { BookingCard } from '../components/BookingCard';
 import { formatVnd, formatClock, formatDuration } from '../lib/format';
-import { IconBell, IconCalendar, IconCheck, IconTicket, IconStar } from '../components/icons';
+import { IconBell, IconCheck, IconTicket, IconStar } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
 const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'GoPark Wallet', cash: 'tiền mặt' };
+
+type TicketItem =
+  | { type: 'booking'; data: Booking }
+  | { type: 'session'; data: Session };
 
 export function TicketPage() {
   const { user, refresh } = useAuth();
   const nav = useNavigate();
   const [actives, setActives] = useState<Session[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [completed, setCompleted] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const seenRef = useRef<Set<number>>(new Set());
 
-  // poll cả phiên active và đặt chỗ đang chờ
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
   useEffect(() => {
     let stop = false;
     const tick = async () => {
@@ -42,30 +47,54 @@ export function TicketPage() {
                 setCompleted(detail.session);
                 refresh();
               }
-            } catch {
-              /* ignore */
-            }
+            } catch { /* ignore */ }
           }
         }
         seenRef.current = ids;
         setActives(list);
         setBookings(bookingRes.bookings);
-        setSelectedId((cur) => (cur != null && ids.has(cur) ? cur : list[0]?.id ?? null));
       } finally {
         if (!stop) setLoading(false);
       }
     };
     tick();
     const t = setInterval(tick, 2500);
-    return () => {
-      stop = true;
-      clearInterval(t);
-    };
+    return () => { stop = true; clearInterval(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const patchSession = (s: Session) =>
     setActives((list) => list.map((x) => (x.id === s.id ? s : x)));
+
+  const tickets: TicketItem[] = [
+    ...bookings.map((b) => ({ type: 'booking' as const, data: b })),
+    ...actives.map((s) => ({ type: 'session' as const, data: s })),
+  ];
+
+  const onScroll = () => {
+    const el = carouselRef.current;
+    if (!el) return;
+    setActiveIdx(Math.round(el.scrollLeft / el.clientWidth));
+  };
+
+  const scrollToIdx = (idx: number) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.clientWidth, behavior: 'smooth' });
+  };
+
+  const removeBooking = (id: number) => {
+    setBookings((prev) => {
+      const next = prev.filter((x) => x.id !== id);
+      // if the removed card was last, scroll back one
+      const removedAt = bookings.findIndex((x) => x.id === id);
+      const newTotal = next.length + actives.length;
+      if (removedAt !== -1 && activeIdx >= newTotal && newTotal > 0) {
+        setTimeout(() => scrollToIdx(newTotal - 1), 50);
+      }
+      return next;
+    });
+  };
 
   if (loading) return <div className="grid h-full place-items-center text-slate-400">Đang tải…</div>;
 
@@ -80,74 +109,82 @@ export function TicketPage() {
       />
     );
 
-  if (actives.length === 0 && bookings.length === 0) return <EmptyTicket onFind={() => nav('/')} />;
-
-  const selected = actives.find((s) => s.id === selectedId) ?? actives[0];
+  if (tickets.length === 0) return <EmptyTicket onFind={() => nav('/')} />;
 
   return (
-    <div className="space-y-4 px-4 pt-4 pb-32">
-      <div className="flex items-center justify-between">
+    <div className="flex h-full flex-col overflow-hidden">
+      {/* ── Header ───────────────────────────────────────────────── */}
+      <div className="shrink-0 flex items-center justify-between px-5 pt-5 pb-3">
         <div className="flex items-center gap-2">
-          <span className="h-3 w-3 rounded-full bg-brand-600" />
+          <span className="h-2.5 w-2.5 rounded-full bg-brand-600" />
           <span className="font-bold text-brand-700">GoPark</span>
         </div>
-        <IconBell width={20} className="text-slate-400" />
+        <div className="flex items-center gap-3">
+          {tickets.length > 1 && (
+            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
+              {activeIdx + 1} / {tickets.length}
+            </span>
+          )}
+          <IconBell width={20} className="text-slate-400" />
+        </div>
       </div>
 
-      {/* Đặt chỗ đang chờ */}
-      {bookings.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <IconCalendar width={16} className="text-blue-500" />
-            <h2 className="font-bold text-slate-800">Chỗ đã đặt</h2>
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
-              {bookings.length}
-            </span>
-          </div>
-          {bookings.map((b) => (
-            <BookingCard
-              key={b.id}
-              booking={b}
-              onCancelled={(id) => setBookings((prev) => prev.filter((x) => x.id !== id))}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Phiên gửi xe đang active */}
-      {actives.length > 0 && (
-        <div className="space-y-4">
-          <div>
-            <h1 className="text-xl font-extrabold text-slate-900">Xe đang gửi</h1>
-            <p className="text-sm text-slate-400">
-              {actives.length > 1 ? `Bạn đang gửi ${actives.length} xe` : `Đang đỗ tại ${selected.lot.name}`}
-            </p>
-          </div>
-
-          {/* Bộ chọn xe khi gửi nhiều xe */}
-          {actives.length > 1 && (
-            <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-              {actives.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSelectedId(s.id)}
-                  className={`flex shrink-0 items-center gap-2 rounded-xl border-2 px-3 py-2 transition ${
-                    s.id === selected.id ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white'
-                  }`}
-                >
-                  <PlateDisplay plate={s.plate} className="text-sm" />
-                  <span className="max-w-[7rem] truncate text-xs text-slate-400">{s.lot.name}</span>
-                </button>
-              ))}
+      {/* ── Carousel ─────────────────────────────────────────────── */}
+      <div
+        ref={carouselRef}
+        onScroll={onScroll}
+        className="no-scrollbar flex flex-1 overflow-x-auto"
+        style={{ scrollSnapType: 'x mandatory' }}
+      >
+        {tickets.map((ticket) => {
+          const key = ticket.type === 'booking' ? `b-${ticket.data.id}` : `s-${ticket.data.id}`;
+          return (
+            <div
+              key={key}
+              className="no-scrollbar h-full shrink-0 overflow-y-auto px-4 pb-28"
+              style={{ scrollSnapAlign: 'start', width: '100%' }}
+            >
+              {ticket.type === 'booking' ? (
+                <BookingCard
+                  booking={ticket.data}
+                  onCancelled={removeBooking}
+                />
+              ) : (
+                <ActiveTicket
+                  session={ticket.data}
+                  walletBalance={user?.wallet_balance ?? 0}
+                  onPay={patchSession}
+                />
+              )}
             </div>
-          )}
+          );
+        })}
+      </div>
 
-          <ActiveTicket session={selected} walletBalance={user?.wallet_balance ?? 0} onPay={patchSession} />
+      {/* ── Dot indicators ───────────────────────────────────────── */}
+      {tickets.length > 1 && (
+        <div className="shrink-0 flex items-center justify-center gap-2 pb-4 pt-2">
+          {tickets.map((ticket, i) => {
+            const isBooking = ticket.type === 'booking';
+            return (
+              <button
+                key={i}
+                onClick={() => scrollToIdx(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === activeIdx
+                    ? `w-6 ${isBooking ? 'bg-blue-500' : 'bg-brand-600'}`
+                    : 'w-2 bg-slate-300'
+                }`}
+              />
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
+
+// ── Sub-components ────────────────────────────────────────────────
 
 function EmptyTicket({ onFind }: { onFind: () => void }) {
   return (
@@ -183,7 +220,7 @@ function ActiveTicket({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-1">
       {/* Ticket card */}
       <div className="card overflow-hidden">
         <div className="flex items-start justify-between gap-3 p-5">
@@ -201,7 +238,7 @@ function ActiveTicket({
         </div>
 
         <div className="grid grid-cols-2 gap-3 border-t border-white/40 px-5 py-3">
-          <Field label="Thời gian vào" value={`${formatClock(session.checkin_at)}`} />
+          <Field label="Thời gian vào" value={formatClock(session.checkin_at)} />
           <Field
             label="Thời gian đỗ"
             value={<span className="font-mono text-blue-600">{formatDuration(now - session.checkin_at)}</span>}
@@ -293,7 +330,6 @@ function SuccessView({
           </div>
         </div>
 
-        {/* Mời đánh giá trải nghiệm ngay sau khi gửi xe xong */}
         <CheckoutReviewPrompt session={session} />
 
         {remaining > 0 ? (
@@ -309,7 +345,6 @@ function SuccessView({
   );
 }
 
-/** Lời mời đánh giá trải nghiệm ở màn checkout thành công. */
 function CheckoutReviewPrompt({ session }: { session: Session }) {
   const [rating, setRating] = useState(5);
   const [hover, setHover] = useState(0);
@@ -323,7 +358,7 @@ function CheckoutReviewPrompt({ session }: { session: Session }) {
       await api.submitReview(session.lot_id, rating, comment);
       setDone(true);
     } catch {
-      setDone(true); // dù lỗi cũng đóng prompt, không chặn luồng checkout
+      setDone(true);
     } finally {
       setBusy(false);
     }

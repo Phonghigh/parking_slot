@@ -1,12 +1,12 @@
-# Admin — Government Dashboard
+# Admin - Government Dashboard
 
 **Summary:** Analytics dashboard for urban management bodies (Phase 3 roadmap).  
 **Last updated:** 2026-06-27  
-**Related PRD section:** F9 — Admin / Government Dashboard (Future Roadmap)
+**Related PRD section:** F9 - Admin / Government Dashboard (Future Roadmap)
 
 ---
 
-> **Status: Phase 3 — Not in MVP or Phase 2 scope.**  
+> **Status: Phase 3 - Not in MVP or Phase 2 scope.**  
 > This file is a placeholder. Flesh out when Phase 3 development begins.
 
 ---

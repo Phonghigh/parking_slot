@@ -1,7 +1,7 @@
-# UI/UX — Interaction Patterns
+# UI/UX - Interaction Patterns
 
 **Last updated:** 2026-06-27  
-**Related PRD section:** Platform — Web App (responsive, mobile-first)
+**Related PRD section:** Platform - Web App (responsive, mobile-first)
 
 ---
 
@@ -105,7 +105,7 @@ Bạn sẽ mất thông tin phiên hiện tại.
 [ Huỷ phiên ]   [ Giữ lại ]
 ```
 
-- Destructive action on the LEFT (unexpected — prevents accidental confirmation)
+- Destructive action on the LEFT (unexpected - prevents accidental confirmation)
 
 ---
 
@@ -131,7 +131,7 @@ Bạn sẽ mất thông tin phiên hiện tại.
 | Time | `08:32` (24-hour, no AM/PM) |
 | Phone | `0912 345 678` (spaced groups) |
 | Plate | `51B-12345` (dash separator) |
-| Greetings in UI | Avoid formal/informal ambiguity — use neutral phrasing |
+| Greetings in UI | Avoid formal/informal ambiguity - use neutral phrasing |
 
 ---
 
@@ -139,9 +139,9 @@ Bạn sẽ mất thông tin phiên hiện tại.
 
 1. **Back button always visible** on sub-screens (never trap user)
 2. **Tab bar always visible** on main screens (not hidden on scroll)
-3. **No hamburger menu** for commuter app — all primary actions reachable in ≤2 taps
+3. **No hamburger menu** for commuter app - all primary actions reachable in ≤2 taps
 4. **Deep links** supported for lot detail: `/lot/{lotID}` (for BusMap/Maps integration)
-5. **Session state persisted** — closing and reopening app resumes active session view
+5. **Session state persisted** - closing and reopening app resumes active session view
 
 ---
 

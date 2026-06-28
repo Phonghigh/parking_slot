@@ -2,7 +2,7 @@
   "name": "gopark",
   "version": "1.0.0",
   "private": true,
-  "description": "GoPark — tìm bãi đỗ & gửi xe không vé giấy (single-service deploy)",
+  "description": "GoPark - tìm bãi đỗ & gửi xe không vé giấy (single-service deploy)",
   "engines": {
     "node": ">=22.5.0"
   },

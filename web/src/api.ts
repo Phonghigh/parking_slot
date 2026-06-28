@@ -107,6 +107,14 @@ export interface Booking {
   lot: { id: number; name: string; address: string };
 }
 
+export interface Vehicle {
+  id: number;
+  user_id: number;
+  plate: string;
+  label: string | null;
+  created_at: number;
+}
+
 export interface ActivityEvent {
   type: 'checkin' | 'checkout';
   plate: string;
@@ -204,4 +212,14 @@ export const api = {
     request<{ booking: Booking }>(`/bookings/lookup?q=${encodeURIComponent(q)}`),
   convertBookingToCheckin: (id: number) =>
     request<{ session: Session }>(`/bookings/${id}/checkin`, { method: 'POST' }),
+
+  // vehicles
+  listVehicles: () => request<{ vehicles: Vehicle[] }>('/vehicles'),
+  addVehicle: (plate: string, label?: string) =>
+    request<{ vehicle: Vehicle }>('/vehicles', {
+      method: 'POST',
+      body: JSON.stringify({ plate, label }),
+    }),
+  deleteVehicle: (id: number) =>
+    request<{ ok: boolean }>(`/vehicles/${id}`, { method: 'DELETE' }),
 };
