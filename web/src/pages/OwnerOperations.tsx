@@ -230,7 +230,7 @@ function CheckinPanel({ lot, onDone }: { lot: Lot; onDone: () => void }) {
         Quét <b>QR định danh</b> (xe vào thường) hoặc <b>QR Đặt chỗ</b> (khách đã đặt trước) - hệ thống tự nhận loại.
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
             <Num n={1} /> Quét mã QR của khách
@@ -407,7 +407,7 @@ function CheckoutPanel({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div>
         <h4 className="mb-2 flex items-center gap-2 font-semibold text-slate-700">
           <Num n={1} /> Quét QR Checkout của khách

@@ -14,7 +14,7 @@ export function CheckinQrPage() {
         <IconBack />
       </button>
 
-      <div className="card flex flex-1 flex-col items-center justify-center p-6 text-center">
+      <div className="card flex flex-1 flex-col items-center justify-center p-4 text-center sm:p-6">
         <h1 className="text-xl font-extrabold text-slate-900">Mã QR Check-in</h1>
         <p className="mx-auto mt-2 max-w-xs text-sm text-slate-500">
           Vui lòng đưa mã này cho nhân viên để check-in. Hệ thống sẽ tự động liên kết biển số xe của bạn.

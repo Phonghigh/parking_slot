@@ -30,7 +30,7 @@ export function OwnerLayout() {
       }}
     >
       {/* Sidebar */}
-      <aside className="owner-aside sticky top-0 z-10 flex h-screen w-[260px] shrink-0 flex-col px-4 py-6 text-white">
+      <aside className="owner-aside sticky top-0 z-10 hidden h-screen w-[260px] shrink-0 flex-col px-4 py-6 text-white md:flex">
         <div className="flex items-center gap-3 px-2">
           <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white/15 text-xl font-black backdrop-blur">
             G
@@ -90,7 +90,25 @@ export function OwnerLayout() {
 
       {/* Content */}
       <div className="relative z-[1] flex min-h-screen flex-1 flex-col">
-        <header className="glass-header sticky top-0 z-10 flex items-center justify-between px-8 py-3.5">
+        {/* Mobile-only nav strip — sidebar is hidden below md */}
+        <div className="flex items-center border-b border-slate-100 bg-white/80 px-4 py-2 md:hidden">
+          {NAV.map((n) => (
+            <NavLink
+              key={n.to}
+              to={n.to}
+              end={n.end}
+              className={({ isActive }) =>
+                `flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 text-xs font-semibold transition ${
+                  isActive ? 'text-brand-700' : 'text-slate-500'
+                }`
+              }
+            >
+              <n.icon width={18} />
+              {n.label}
+            </NavLink>
+          ))}
+        </div>
+        <header className="glass-header sticky top-0 z-10 flex items-center justify-between px-4 py-3.5 md:px-8">
           <span className="glass-green inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm font-semibold text-brand-700">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-500 opacity-75" />
@@ -107,7 +125,7 @@ export function OwnerLayout() {
             </button>
           </div>
         </header>
-        <main className="flex-1 px-8 py-7">
+        <main className="flex-1 px-4 py-5 md:px-8 md:py-7">
           <Outlet />
         </main>
       </div>

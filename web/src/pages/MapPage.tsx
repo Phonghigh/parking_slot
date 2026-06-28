@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api, Lot } from '../api';
 import { MapView } from '../components/MapView';
@@ -6,7 +6,7 @@ import { LotCard } from '../components/LotCard';
 import { capacityColor, effectivePrice, formatDistance, formatVnd } from '../lib/format';
 import {
   IconMenu, IconMic, IconList, IconTarget, IconSliders,
-  IconPin, IconMap, IconRoof,
+  IconPin, IconMap,
 } from '../components/icons';
 import { subscribeLotUpdates } from '../lib/liveEvents';
 
@@ -18,7 +18,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'covered',
     label: 'Mái che',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M23 12a11.05 11.05 0 0 0-22 0zm-5 7a3 3 0 0 1-6 0v-7" />
       </svg>
     ),
@@ -27,7 +27,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'guarded',
     label: 'Giữ xe',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="1" y="9" width="22" height="9" rx="2" />
         <path d="M6 18v2M18 18v2" />
         <path d="M3 9l2-5h14l2 5" />
@@ -40,7 +40,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'elevator',
     label: 'Thang máy',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="2" width="18" height="20" rx="2" />
         <path d="M12 2v20M9 7l3-3 3 3M9 17l3 3 3-3" />
       </svg>
@@ -50,7 +50,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'ev',
     label: 'Sạc xe điện',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2" />
         <path d="M15 14h5l-5 6h5" />
         <path d="M7 14h2v4H7zM11 14h2v4h-2z" />
@@ -61,7 +61,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'restroom',
     label: 'Nhà vệ sinh',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="9" cy="4" r="1.5" />
         <circle cx="15" cy="4" r="1.5" />
         <path d="M6 8h4l1 6H7L6 8zM14 8h4l-1 7h-2l-1-7z" />
@@ -73,7 +73,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'h24',
     label: '24/7',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
         <path d="M12 6v6l4 2" />
       </svg>
@@ -83,7 +83,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'monthly',
     label: 'Thẻ tháng',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2" />
         <path d="M2 10h20" />
         <path d="M6 15h4M16 15h2" />
@@ -94,7 +94,7 @@ const AMENITIES: { key: string; label: string; svg: React.ReactNode }[] = [
     key: 'camera',
     label: 'Camera',
     svg: (
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
         <circle cx="12" cy="13" r="4" />
       </svg>
@@ -110,6 +110,11 @@ export function MapPage() {
   const [lots, setLots] = useState<Lot[]>([]);
   const [activeLot, setActiveLot] = useState<Lot | undefined>();
   const [searchPin, setSearchPin] = useState<{ coords: [number, number]; name: string } | null>(null);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [centerKey, setCenterKey] = useState(0);
+  // Prevents the async mount GPS callback from overriding a search-navigation center
+  const searchAppliedRef = useRef(false);
   const [sort, setSort] = useState<SortKey>('distance');
   const [onlyAvailable, setOnlyAvailable] = useState(false);
   const [showList, setShowList] = useState(false);
@@ -202,11 +207,15 @@ export function MapPage() {
         (pos) => {
           const c: [number, number] = [pos.coords.latitude, pos.coords.longitude];
           setUserPos(c);
-          setCenter(c);
-          loadLots(c);
+          // Don't hijack the map center if the user already navigated to a search result
+          if (!searchAppliedRef.current) {
+            setCenter(c);
+            setCenterKey((k) => k + 1);
+            loadLots(c);
+          }
         },
         () => {},
-        { timeout: 5000 }
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 60000 }
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,8 +228,10 @@ export function MapPage() {
     const selectLot = state?.selectLot;
 
     if (selectLot) {
+      searchAppliedRef.current = true;
       const coords: [number, number] = [selectLot.lat, selectLot.lng];
       setCenter(coords);
+      setCenterKey((k) => k + 1);
       setActiveLot(selectLot);
       setSearchPin(null);
       setShowList(false);
@@ -230,7 +241,9 @@ export function MapPage() {
       setTimeout(() => setFlashIds(new Set()), 1600);
       window.history.replaceState({}, '');
     } else if (fly) {
+      searchAppliedRef.current = true;
       setCenter(fly.coords);
+      setCenterKey((k) => k + 1);
       setSearchPin({ coords: fly.coords, name: fly.name });
       loadLots(fly.coords);
       window.history.replaceState({}, '');
@@ -239,14 +252,43 @@ export function MapPage() {
   }, [location.state]);
 
   const useGps = () => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const c: [number, number] = [pos.coords.latitude, pos.coords.longitude];
-      setUserPos(c);
-      setCenter(c);
-      setSearchPin(null);
-      loadLots(c);
-    });
+    console.log('[GPS] Button clicked');
+    if (!navigator.geolocation) {
+      console.warn('[GPS] navigator.geolocation not available on this device/browser');
+      setGpsError('Thiết bị không hỗ trợ GPS');
+      setTimeout(() => setGpsError(null), 4000);
+      return;
+    }
+    console.log('[GPS] Requesting position... (enableHighAccuracy=true, timeout=5000ms)');
+    setGpsError(null);
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const c: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        console.log('[GPS] Success →', c, `accuracy: ${pos.coords.accuracy}m`);
+        setUserPos(c);
+        searchAppliedRef.current = false;
+        setCenter(c);
+        setCenterKey((k) => k + 1);
+        setSearchPin(null);
+        loadLots(c);
+        setGpsLoading(false);
+      },
+      (err) => {
+        console.error('[GPS] Error → code:', err.code, '| message:', err.message);
+        console.error('[GPS] Codes: 1=PERMISSION_DENIED  2=POSITION_UNAVAILABLE  3=TIMEOUT');
+        const msg =
+          err.code === err.PERMISSION_DENIED
+            ? 'Hãy cho phép truy cập vị trí trong cài đặt trình duyệt'
+            : err.code === err.TIMEOUT
+            ? 'GPS mất quá lâu, thử lại sau'
+            : 'Không thể xác định vị trí (cần mạng hoặc GPS)';
+        setGpsError(msg);
+        setGpsLoading(false);
+        setTimeout(() => setGpsError(null), 5000);
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 30000 }
+    );
   };
 
   const visible = useMemo(() => {
@@ -283,6 +325,7 @@ export function MapPage() {
       {/* ── Map - full screen background ────────────────────────── */}
       <MapView
         center={center}
+        flyKey={centerKey}
         userPos={userPos}
         lots={visible}
         activeId={activeLot?.id}
@@ -324,7 +367,7 @@ export function MapPage() {
               strokeWidth="2.5" strokeLinecap="round" className="shrink-0 text-slate-400">
               <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
             </svg>
-            <span className="flex-1 text-sm text-slate-400">Tìm bãi xe, địa điểm, tòa nhà...</span>
+            <span className="flex-1 truncate text-sm text-slate-400">Tìm bãi xe, địa điểm, tòa nhà...</span>
           </button>
 
           <button
@@ -336,6 +379,15 @@ export function MapPage() {
           </button>
         </div>
       </div>
+
+      {/* ── GPS error toast ─────────────────────────────────────── */}
+      {gpsError && (
+        <div className="absolute inset-x-4 z-20 animate-fade-slide-up" style={{ top: '72px' }}>
+          <div className="rounded-2xl bg-red-50 px-4 py-2.5 text-center text-xs font-medium text-red-600 shadow-sm">
+            {gpsError}
+          </div>
+        </div>
+      )}
 
       {/* ── Floating filter chips ────────────────────────────────── */}
       <div className="absolute inset-x-0 z-10" style={{ top: '68px' }}>
@@ -352,11 +404,7 @@ export function MapPage() {
           >
             Giá rẻ
           </FilterChip>
-          <FilterChip active={amenities.has('covered')} onClick={() => {
-            setAmenities((prev) => { const n = new Set(prev); n.has('covered') ? n.delete('covered') : n.add('covered'); return n; });
-          }}>
-            <IconRoof width={13} /> Mái che
-          </FilterChip>
+
           <button
             onClick={openFilterSheet}
             className={`relative shrink-0 rounded-xl p-2.5 shadow-sm transition active:scale-95 ${
@@ -407,7 +455,7 @@ export function MapPage() {
               >Xóa tất cả</button>
             </div>
 
-            <div className="px-5 pt-2 space-y-6">
+            <div className="px-4 pt-2 space-y-6">
               {/* Khoảng cách */}
               <div>
                 <p className="mb-3 text-sm font-bold text-slate-700">Khoảng cách</p>
@@ -458,7 +506,7 @@ export function MapPage() {
               {/* Tiện ích */}
               <div>
                 <p className="mb-3 text-sm font-bold text-slate-700">Tiện ích</p>
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-4 gap-2">
                   {AMENITIES.map(({ key, label, svg }) => {
                     const active = draftAmenities.has(key);
                     return (
@@ -472,13 +520,13 @@ export function MapPage() {
                             : '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.9)',
                           border: active ? '1.5px solid rgba(26,58,107,0.6)' : '1.5px solid rgba(226,232,240,0.8)',
                         }}
-                        className="flex flex-col items-center gap-2 rounded-2xl px-1 py-3.5 transition-all duration-200 active:scale-95"
+                        className="flex flex-col items-center gap-1.5 rounded-2xl py-3 transition-all duration-200 active:scale-95"
                       >
                         <span style={{ color: active ? '#fff' : '#475569' }}>
                           {svg}
                         </span>
                         <span
-                          className="text-center text-[11px] font-semibold leading-tight"
+                          className="w-full text-center text-[11px] font-semibold leading-tight line-clamp-1"
                           style={{ color: active ? 'rgba(255,255,255,0.9)' : '#64748b' }}
                         >
                           {label}
@@ -518,7 +566,7 @@ export function MapPage() {
             </div>
 
             {/* Footer actions */}
-            <div className="sticky bottom-0 mt-6 border-t border-slate-100 bg-white px-5 pt-4 pb-2">
+            <div className="sticky bottom-0 mt-6 border-t border-slate-100 bg-white px-4 pt-4 pb-2">
               <button
                 onClick={applyFilters}
                 className="w-full rounded-2xl bg-[#1a3a6b] py-3.5 text-sm font-bold text-white transition active:scale-[0.98]"
@@ -549,10 +597,17 @@ export function MapPage() {
         </button>
         <button
           onClick={useGps}
-          className="glass-icon grid h-10 w-10 place-items-center rounded-2xl shadow-md transition active:scale-95"
+          disabled={gpsLoading}
+          className={`glass-icon grid h-10 w-10 place-items-center rounded-2xl shadow-md transition active:scale-95 ${gpsLoading ? 'opacity-60' : ''}`}
           title="Vị trí của tôi"
         >
-          <IconTarget width={18} className="text-blue-500" />
+          {gpsLoading ? (
+            <svg className="animate-spin text-blue-500" width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <IconTarget width={18} className={userPos ? 'text-blue-600' : 'text-blue-400'} />
+          )}
         </button>
       </div>
 
@@ -640,14 +695,14 @@ function SuggestionCard({ lot, onDetail }: { lot: Lot; onDetail: () => void }) {
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-3">
-        <span className="text-[11px] font-medium text-slate-400">Gợi ý tốt nhất</span>
+      <div className="flex items-center justify-between gap-2 px-4 pt-3">
+        <span className="shrink-0 text-[11px] font-medium text-slate-400">Gợi ý tốt nhất</span>
         <button
           onClick={onDetail}
-          className="flex items-center gap-0.5 text-sm font-semibold text-slate-700 transition active:scale-95"
+          className="flex min-w-0 items-center gap-0.5 text-sm font-semibold text-slate-700 transition active:scale-95"
         >
-          {lot.name}
-          <span className="ml-1 text-slate-400">›</span>
+          <span className="truncate">{lot.name}</span>
+          <span className="ml-1 shrink-0 text-slate-400">›</span>
         </button>
       </div>
 

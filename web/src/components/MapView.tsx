@@ -84,11 +84,13 @@ function userIcon() {
   });
 }
 
-function Recenter({ center }: { center: [number, number] }) {
+function Recenter({ center, flyKey }: { center: [number, number]; flyKey: number }) {
   const map = useMap();
   useEffect(() => {
     map.flyTo(center, Math.max(map.getZoom(), 14), { duration: 0.6 });
-  }, [center[0], center[1]]);
+  // flyKey increments on every intentional re-center, even when coords are identical
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center[0], center[1], flyKey]);
   return null;
 }
 

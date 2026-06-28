@@ -156,7 +156,7 @@ export function AccountPage() {
                   <div>
                     <p className="font-mono text-sm font-bold tracking-wide text-slate-800">{v.plate}</p>
                     {v.label && (
-                      <p className="text-xs text-slate-400">{v.label}</p>
+                      <p className="max-w-[140px] truncate text-xs text-slate-400">{v.label}</p>
                     )}
                   </div>
                 </div>

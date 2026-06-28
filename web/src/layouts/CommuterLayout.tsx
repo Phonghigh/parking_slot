@@ -76,7 +76,7 @@ export function CommuterLayout() {
       </main>
 
       <nav className="glass-nav fixed bottom-5 left-1/2 z-20 mx-auto w-[88%] max-w-sm -translate-x-1/2 rounded-full px-3 py-2">
-        <div className="relative flex items-center justify-evenly">
+        <div className="relative grid grid-cols-4 items-center">
           {blobReady && (
             <div
               className={`blob-indicator${blob.phase === 'land' ? ' landing' : ''}`}
@@ -91,7 +91,7 @@ export function CommuterLayout() {
               to={tab.to}
               end={tab.end}
               className={({ isActive }) =>
-                `relative z-10 flex flex-col items-center gap-0.5 rounded-full px-4 py-2 text-xs font-medium transition-colors duration-200 ${
+                `relative z-10 flex flex-col items-center gap-0.5 whitespace-nowrap rounded-full px-1 py-2 text-[10px] font-medium transition-colors duration-200 ${
                   isActive ? 'text-brand-600' : 'text-slate-400 hover:text-slate-600'
                 }`
               }
