@@ -79,3 +79,18 @@ export const IconWallet = (p: P) => (
 export const IconUser = (p: P) => (
   <svg {...base(p)}><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
 );
+export const IconMenu = (p: P) => (
+  <svg {...base(p)}><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+);
+export const IconMic = (p: P) => (
+  <svg {...base(p)}><rect x="9" y="2" width="6" height="11" rx="3" /><path d="M5 10a7 7 0 0014 0M12 19v3M9 22h6" /></svg>
+);
+export const IconList = (p: P) => (
+  <svg {...base(p)}><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><circle cx="3" cy="6" r="1.5" fill="currentColor" stroke="none" /><circle cx="3" cy="12" r="1.5" fill="currentColor" stroke="none" /><circle cx="3" cy="18" r="1.5" fill="currentColor" stroke="none" /></svg>
+);
+export const IconTarget = (p: P) => (
+  <svg {...base(p)}><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg>
+);
+export const IconSliders = (p: P) => (
+  <svg {...base(p)}><line x1="4" y1="6" x2="20" y2="6" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="18" x2="20" y2="18" /><circle cx="9" cy="6" r="2.5" fill="white" /><circle cx="15" cy="12" r="2.5" fill="white" /><circle cx="9" cy="18" r="2.5" fill="white" /></svg>
+);

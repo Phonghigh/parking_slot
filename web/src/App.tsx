@@ -14,6 +14,7 @@ import { AccountPage } from './pages/AccountPage';
 import { OwnerDashboard } from './pages/OwnerDashboard';
 import { OwnerOperations } from './pages/OwnerOperations';
 import { OwnerProfile } from './pages/OwnerProfile';
+import { SearchPage } from './pages/SearchPage';
 
 export function App() {
   return (
@@ -45,6 +46,7 @@ export function App() {
       >
         <Route path="/lot/:id" element={<LotDetail />} />
         <Route path="/checkin" element={<CheckinQrPage />} />
+        <Route path="/search" element={<SearchPage />} />
       </Route>
 
       {/* Owner (web desktop) */}

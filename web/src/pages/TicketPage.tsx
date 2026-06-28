@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api, Session } from '../api';
+import { api, Booking, Session } from '../api';
 import { useAuth } from '../auth/AuthContext';
 import { QrDisplay } from '../components/QrDisplay';
 import { PaymentSelector } from '../components/PaymentSelector';
+import { BookingCard } from '../components/BookingCard';
 import { formatVnd, formatClock, formatDuration } from '../lib/format';
-import { IconBell, IconCheck, IconTicket, IconStar } from '../components/icons';
+import { IconBell, IconCalendar, IconCheck, IconTicket, IconStar } from '../components/icons';
 import { PlateDisplay } from '../components/PlateDisplay';
 
 const PM_LABEL: Record<string, string> = { momo: 'Momo', wallet: 'GoPark Wallet', cash: 'tiền mặt' };
@@ -14,22 +15,25 @@ export function TicketPage() {
   const { user, refresh } = useAuth();
   const nav = useNavigate();
   const [actives, setActives] = useState<Session[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [completed, setCompleted] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const seenRef = useRef<Set<number>>(new Set());
 
-  // poll danh sách phiên active (1 người có thể gửi nhiều xe)
+  // poll cả phiên active và đặt chỗ đang chờ
   useEffect(() => {
     let stop = false;
     const tick = async () => {
       try {
-        const r = await api.activeSessions();
+        const [sessionRes, bookingRes] = await Promise.all([
+          api.activeSessions(),
+          api.activeBookings(),
+        ]);
         if (stop) return;
-        const list = r.sessions;
+        const list = sessionRes.sessions;
         const ids = new Set(list.map((s) => s.id));
 
-        // phiên vừa biến mất khỏi active → kiểm tra đã checkout chưa để hiện màn thành công
         for (const id of seenRef.current) {
           if (!ids.has(id)) {
             try {
@@ -45,6 +49,7 @@ export function TicketPage() {
         }
         seenRef.current = ids;
         setActives(list);
+        setBookings(bookingRes.bookings);
         setSelectedId((cur) => (cur != null && ids.has(cur) ? cur : list[0]?.id ?? null));
       } finally {
         if (!stop) setLoading(false);
@@ -75,7 +80,7 @@ export function TicketPage() {
       />
     );
 
-  if (actives.length === 0) return <EmptyTicket onFind={() => nav('/')} />;
+  if (actives.length === 0 && bookings.length === 0) return <EmptyTicket onFind={() => nav('/')} />;
 
   const selected = actives.find((s) => s.id === selectedId) ?? actives[0];
 
@@ -88,32 +93,58 @@ export function TicketPage() {
         </div>
         <IconBell width={20} className="text-slate-400" />
       </div>
-      <div>
-        <h1 className="text-xl font-extrabold text-slate-900">Xe đang gửi</h1>
-        <p className="text-sm text-slate-400">
-          {actives.length > 1 ? `Bạn đang gửi ${actives.length} xe` : `Đang đỗ tại ${selected.lot.name}`}
-        </p>
-      </div>
 
-      {/* Bộ chọn xe khi gửi nhiều xe */}
-      {actives.length > 1 && (
-        <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-          {actives.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => setSelectedId(s.id)}
-              className={`flex shrink-0 items-center gap-2 rounded-xl border-2 px-3 py-2 transition ${
-                s.id === selected.id ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white'
-              }`}
-            >
-              <PlateDisplay plate={s.plate} className="text-sm" />
-              <span className="max-w-[7rem] truncate text-xs text-slate-400">{s.lot.name}</span>
-            </button>
+      {/* Đặt chỗ đang chờ */}
+      {bookings.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <IconCalendar width={16} className="text-blue-500" />
+            <h2 className="font-bold text-slate-800">Chỗ đã đặt</h2>
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
+              {bookings.length}
+            </span>
+          </div>
+          {bookings.map((b) => (
+            <BookingCard
+              key={b.id}
+              booking={b}
+              onCancelled={(id) => setBookings((prev) => prev.filter((x) => x.id !== id))}
+            />
           ))}
         </div>
       )}
 
-      <ActiveTicket session={selected} walletBalance={user?.wallet_balance ?? 0} onPay={patchSession} />
+      {/* Phiên gửi xe đang active */}
+      {actives.length > 0 && (
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-xl font-extrabold text-slate-900">Xe đang gửi</h1>
+            <p className="text-sm text-slate-400">
+              {actives.length > 1 ? `Bạn đang gửi ${actives.length} xe` : `Đang đỗ tại ${selected.lot.name}`}
+            </p>
+          </div>
+
+          {/* Bộ chọn xe khi gửi nhiều xe */}
+          {actives.length > 1 && (
+            <div className="no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+              {actives.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSelectedId(s.id)}
+                  className={`flex shrink-0 items-center gap-2 rounded-xl border-2 px-3 py-2 transition ${
+                    s.id === selected.id ? 'border-brand-500 bg-brand-50' : 'border-slate-200 bg-white'
+                  }`}
+                >
+                  <PlateDisplay plate={s.plate} className="text-sm" />
+                  <span className="max-w-[7rem] truncate text-xs text-slate-400">{s.lot.name}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <ActiveTicket session={selected} walletBalance={user?.wallet_balance ?? 0} onPay={patchSession} />
+        </div>
+      )}
     </div>
   );
 }

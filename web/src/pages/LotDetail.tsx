@@ -178,9 +178,8 @@ export function LotDetail() {
             <IconQr width={20} /> Gửi xe ngay
           </button>
           <button
-            disabled
-            title="Sắp ra mắt"
-            className="glass-surface btn flex-col gap-0.5 rounded-2xl px-3 py-2 text-xs text-slate-400"
+            onClick={() => nav(`/booking/${lot.id}`)}
+            className="glass-surface btn flex-col gap-0.5 rounded-2xl px-3 py-2 text-xs text-slate-600 transition active:scale-95"
           >
             <IconCalendar width={18} /> Đặt chỗ
           </button>

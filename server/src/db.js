@@ -75,6 +75,23 @@ export function initSchema() {
       FOREIGN KEY (lot_id) REFERENCES lots(id),
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
+
+    CREATE TABLE IF NOT EXISTS bookings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      lot_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      plate TEXT NOT NULL,
+      scheduled_at INTEGER NOT NULL,
+      expires_at INTEGER NOT NULL,
+      booking_token TEXT NOT NULL UNIQUE,
+      short_code TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','checked_in','cancelled','expired')),
+      session_id INTEGER,
+      created_at INTEGER NOT NULL,
+      FOREIGN KEY (lot_id) REFERENCES lots(id),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (session_id) REFERENCES sessions(id)
+    );
   `);
 
   // Migration an toàn cho DB cũ (thêm cột nếu thiếu)
