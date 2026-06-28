@@ -88,8 +88,7 @@ function Recenter({ center, flyKey }: { center: [number, number]; flyKey: number
   const map = useMap();
   useEffect(() => {
     map.flyTo(center, Math.max(map.getZoom(), 14), { duration: 0.6 });
-  // flyKey increments on every intentional re-center, even when coords are identical
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center[0], center[1], flyKey]);
   return null;
 }
@@ -141,6 +140,7 @@ function searchPinIcon(name: string) {
 
 export function MapView({
   center,
+  flyKey,
   userPos,
   lots,
   activeId,
@@ -150,6 +150,7 @@ export function MapView({
   onMapClick,
 }: {
   center: [number, number];
+  flyKey: number;
   userPos: [number, number] | null;
   lots: Lot[];
   activeId?: number;
@@ -166,7 +167,7 @@ export function MapView({
         subdomains="abcd"
         maxZoom={20}
       />
-      <Recenter center={center} />
+      <Recenter center={center} flyKey={flyKey} />
       <DragWatcher onMoveEnd={onMoveEnd} />
       {onMapClick && <MapClickWatcher onClick={onMapClick} />}
       {userPos && <Marker position={userPos} icon={userIcon()} />}
